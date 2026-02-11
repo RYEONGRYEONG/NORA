@@ -1,2 +1,2 @@
 # NORA
-NORA: Nitrate &amp; Optimized Rainfall Analytics
+NORA: Nitrate &amp; Optimised Rainfall Analytics
