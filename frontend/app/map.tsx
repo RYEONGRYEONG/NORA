@@ -1,5 +1,5 @@
 'use client';
-
+import { useRouter } from 'next/navigation'
 import { useState } from 'react';
 
 const counties = [
@@ -12,32 +12,68 @@ export default function Map(){
     const [selectedId, setSelected] = useState<string | null> (null);
 
     const clickCounty = (id: string) => {
+        if (id === 'C0') {
+            alert("Cork region is currently under preparation. Please select Carlow.");
+            return;
+        }
         setSelected(id);
 };
 
+const router = useRouter();
+const selectedCounty = counties.find(c => c.id === selectedId)
+
 return (
+    // view box
     <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl">
         <div className="mb-6 text-center">
             <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
         </div>
 
-    <svg 
-        viewBox="0 0 300 300" 
-        className="w-full h-auto drop-shadow-2xl transition-all duration-500"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <g transform="matrix(0.3,0,0,0.3,0,0)">
-            {counties.map((county) => (
-                <path
-                key={county.id}
-                d={county.d}
-                onClick={() => clickCounty(county.id)}
-                className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
-                    ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-300'}`}
-                />
-            ))}
-        </g>
-    </svg>
+        <div className="relative w-full flex justify-enter py-4">
+            <svg 
+                viewBox="0 0 300 300" 
+                className="w-full h-auto drop-shadow-2xl transition-all duration-500"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+
+                <g transform="matrix(0.3,0,0,0.3,0,0)">
+                    {counties.map((county) => (
+                        <path
+                            key={county.id}
+                            d={county.d}
+                            onClick={() => clickCounty(county.id)}
+                            className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
+                                ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 hover:fill-slate-300'}
+                                ${county.id === 'CO' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                    ))}
+                </g>
+            </svg>
+        </div>
+
+        <div className = "w-full mt-8 min-h-[120px] flex items-center justify-center">
+            {selectedId === 'CW' ? (
+                <div className = "w-full p-6 bg-blue-50 border border-blue-100 rouner-2xl flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className = "flex items-center gap-2 mb-3">
+                        <span className = "relative flex h-3 w-3">
+                            <span className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span className = "relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                        </span>
+                        <span className = "font-bold text-blue-900 text-lg">{selectedCounty?.name} Selected</span>
+                    </div>
+                    <button
+                        onClick={() => router.push('/analysis')}
+                        className = "w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition-all active:scale-95"
+                    >
+                        Confirm Location
+                    </button>
+                </div>
+            ) : (
+                <div className="text-slate-400 text-sm italic border-2 border-dashed border-slate-100 rounded-2xl p-8 w-full text-center">
+                    Select Carlow on the map to proceed
+                </div>
+            )}
+        </div>
     </div>
 );
 }
