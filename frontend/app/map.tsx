@@ -25,17 +25,16 @@ const selectedCounty = counties.find(c => c.id === selectedId)
 
 return (
     // view box
-    <div className="flex flex-col lg:flex-row gap-10 bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-6xl mx-auto items-stretch">
-        
-        <div className="flex-[1.5] flex flex-col items-center border-r border-slate-50 pr-10">
-            <div className="mb-6 text-center w-full">
-                <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
-            </div>
+    <div className = "flex flex-col lg:flex-row items-center justify-center gap-12 bg-white p-12 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-6xl mx-auto">
+    <div className="w-full lg:w-3/5 flex flex-col items-center justify-center">
+        <div className="mb-8 text-center">
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Select field location</h2>
+        </div>
 
-            <div className="relative w-full flex justify-enter py-4">
+        <div className="relative w-full aspect-square flex items-center justify-center bg-slate-50/30 rounded-3xl p-4">
             <svg 
                 viewBox="0 0 300 300" 
-                className="w-full h-auto drop-shadow-2xl transition-all duration-500"
+                className="w-full h-full drop-shadow-2xl transition-all duration-500"
                 xmlns="http://www.w3.org/2000/svg"
             >
 
