@@ -45,7 +45,7 @@ return (
                             d={county.d}
                             onClick={() => clickCounty(county.id)}
                             className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
-                                ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 hover:fill-slate-300'}
+                                ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 :fill-slate-300'}
                                 ${county.id === 'CO' ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     ))}
@@ -73,7 +73,7 @@ return (
 
         <div className = "p-6 border border-dashed border-gray-300 rounded-xl bg-gray-50 flex items-center justify-center">
             <p className="text-sm text-amber-700 font-semibord text-center leading-relaxed">
-                ⚠️ Note: Currently, analysis is optimised<br/> for the Carlow region only.
+                Note: Currently, analysis is optimised<br/> for the Carlow region only.
             </p>
         </div>
         
