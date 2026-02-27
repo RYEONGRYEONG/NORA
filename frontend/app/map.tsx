@@ -25,12 +25,14 @@ const selectedCounty = counties.find(c => c.id === selectedId)
 
 return (
     // view box
-    <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl">
-        <div className="mb-6 text-center">
-            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
-        </div>
+    <div className="flex flex-col lg:flex-row gap-10 bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-6xl mx-auto items-stretch">
+        
+        <div className="flex-[1.5] flex flex-col items-center border-r border-slate-50 pr-10">
+            <div className="mb-6 text-center w-full">
+                <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
+            </div>
 
-        <div className="relative w-full flex justify-enter py-4">
+            <div className="relative w-full flex justify-enter py-4 bg-slate-50/50 rounded-2xl">
             <svg 
                 viewBox="0 0 300 300" 
                 className="w-full h-auto drop-shadow-2xl transition-all duration-500"
@@ -51,41 +53,42 @@ return (
                 </g>
             </svg>
         </div>
+    </div>
 
-        <div className = "w-full md:w-[40%] flex flex-col gap-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-sm min-h-[120px]">
-                        <p className = "text-blue-600 font-semibold mb-2">Selected Location</p>
-                        <h3 className = "text-4xl font-black text-gray-900 flex items-center gap-3">
-                            {selectedId === 'CW' ? (
-                                <>
-                                    <span className = "relative flex h-3 w-3">
-                                        <span className = "animate-ping absolute inline-flex h-full w-full bg-blue-400 opacity-75"></span>
-                                        <span className = "relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                                    </span>
-                                    Carlow
-                                </>
-                            ) : ( '-' )
+    <div className = "flex-1 flex flex-col justify-between py-10 gap-8">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 shadow-sm flex-1 flex flex-col justify-center">
+            <p className = "text-blue-600 font-bold mb-4 text-xs tracking-widest">Selected Location</p>
+            <h3 className = "text-5xl font-black text-gray-900 flex items-center gap-4">
+                {selectedId === 'CW' ? (
+                    <>
+                        <span className = "relative flex h-5 w-5">
+                            <span className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span className = "relative inline-flex rounded-full h-5 w-5 bg-blue-500"></span>
+                        </span>
+                        Carlow
+                    </>
+                ) : ( '-' )
                             }
-                        </h3>
-            </div>
+            </h3>
+        </div>
 
-            <div className = "flex-grow p-6 border border-dashed border-gray-300 rounded-xl flex items-center justify-center text-center">
-                    <p className="text-xs text-amber-600 font-medium bg-amber-50 py-1 px-3 rounded-full border border-amber-100">
-                        ⚠️ Note: Currently, analysis is optimised for the Carlow region only.
-                    </p>
-            </div>
+        <div className = "p-6 border border-dashed border-gray-300 rounded-xl bg-gray-50 flex items-center justify-center">
+            <p className="text-sm text-amber-700 font-semibord text-center leading-relaxed">
+                ⚠️ Note: Currently, analysis is optimised<br/> for the Carlow region only.
+            </p>
+        </div>
         
-            <button
-                onClick={() => selectedId === 'CW' && router.push('/analysis')}
-                disabled={selectedId !== 'CW'}
-                className = {`w-full py-5 rounded-2xl text-xl font-bold transition-all shadow-lg
+         <button
+            onClick={() => selectedId === 'CW' && router.push('/analysis')}
+            disabled={selectedId !== 'CW'}
+            className = {`w-full py-6 rounded-2xl text-2xl font-bold transition-all shadow-xl
                     ${selectedId === 'CW'
                         ? 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-            >
-                Confirm Location
-            </button>
-        </div>
+        >
+            Confirm Location
+        </button>
     </div>
+</div>
 );
 }
