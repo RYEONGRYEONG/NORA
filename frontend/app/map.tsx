@@ -32,7 +32,7 @@ return (
                 <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
             </div>
 
-            <div className="relative w-full flex justify-enter py-4 bg-slate-50/50 rounded-2xl">
+            <div className="relative w-full flex justify-enter py-4">
             <svg 
                 viewBox="0 0 300 300" 
                 className="w-full h-auto drop-shadow-2xl transition-all duration-500"
@@ -88,7 +88,7 @@ return (
         >
             Confirm Location
         </button>
+        </div>
     </div>
-</div>
 );
 }
