@@ -45,7 +45,7 @@ return (
                                 d={county.d}
                                 onClick={() => clickCounty(county.id)}
                                 className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
-                                    ${selectedId === county.id ? 'fill-blue-500' : 'fill-green-100 hover:fill-green-200'}'}`}
+                                    ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 hover:fill-slate-300'}'}`}
                             />
                         ))}
                     </g>
