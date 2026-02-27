@@ -12,7 +12,7 @@ export default function Map(){
     const [selectedId, setSelected] = useState<string | null> (null);
 
     const clickCounty = (id: string) => {
-        if (id === 'C0') {
+        if (id === 'CO') {
             alert("Cork region is currently under preparation. Please select Carlow.");
             return;
         }
