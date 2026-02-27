@@ -30,27 +30,27 @@ return (
             <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
         </div>
 
-        <div className="relative w-full flex justify-enter">
-            <div className="w-full md:w-[60%] border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex items-center justify-center">
-                <svg 
-                    viewBox="0 0 300 300" 
-                    className="w-full h-auto max-h-[500px]"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+        <div className="relative w-full flex justify-enter py-4">
+            <svg 
+                viewBox="0 0 300 300" 
+                className="w-full h-auto drop-shadow-2xl transition-all duration-500"
+                xmlns="http://www.w3.org/2000/svg"
+            >
 
-                    <g transform="matrix(0.3,0,0,0.3,0,0)">
-                        {counties.map((county) => (
-                            <path
-                                key={county.id}
-                                d={county.d}
-                                onClick={() => clickCounty(county.id)}
-                                className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
-                                    ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 hover:fill-slate-300'}'}`}
-                            />
-                        ))}
-                    </g>
-                </svg>
-            </div>
+                <g transform="matrix(0.3,0,0,0.3,0,0)">
+                    {counties.map((county) => (
+                        <path
+                            key={county.id}
+                            d={county.d}
+                            onClick={() => clickCounty(county.id)}
+                            className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
+                                ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 hover:fill-slate-300'}
+                                ${county.id === 'CO' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                    ))}
+                </g>
+            </svg>
+        </div>
 
         <div className = "w-full md:w-[40%] flex flex-col gap-6">
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-sm min-h-[120px]">
@@ -86,7 +86,6 @@ return (
                 Confirm Location
             </button>
         </div>
-    </div>
     </div>
 );
 }
