@@ -31,7 +31,7 @@ return (
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Select field location</h2>
         </div>
 
-        <div className="relative w-full aspect-square flex items-center justify-center bg-slate-50/30 rounded-3xl p-4">
+        <div className="relative w-full aspect-square flex items-center justify-center bg-slate-50/20 rounded-3xl p-8 border border-slate-200 shadow-inner">
             <svg 
                 viewBox="0 0 300 300" 
                 className="w-full h-full drop-shadow-2xl transition-all duration-500"
