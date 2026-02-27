@@ -82,7 +82,7 @@ return (
             disabled={selectedId !== 'CW'}
             className = {`w-full py-6 rounded-2xl text-2xl font-bold transition-all shadow-xl
                     ${selectedId === 'CW'
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95'
+                        ? 'bg-[#0782c5] hover:bg-[#0671ab] text-white active:scale-95'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
             Confirm Location
