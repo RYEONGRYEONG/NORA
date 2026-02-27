@@ -15,7 +15,7 @@ app = FastAPI()
 # FastAPI 8000 port / Next.js 3000 port
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["http://localhost:3000", "https://nora-virid.vercel.app"],
+    allow_origins = ["*"],
     allow_methods=["*"], # get, post, delete
     allow_headers=["*"], # auth token
 )
@@ -23,7 +23,7 @@ app.add_middleware(
 @app.get("/analysis/{location}")
 def get_analysis(location: str):
     with db_conn.connect() as conn:
-        query = text("select * from analysis_runs where location :loc")
+        query = text("select * from analysis_runs where location = :loc")
         result = conn.execute(query, {"loc": location}).mappings().first()
 
         if result is None:
