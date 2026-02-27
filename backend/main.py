@@ -7,6 +7,7 @@ from database import db_conn
 from sign import sign_up, sign_in
 from sqlalchemy import text
 import json
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -22,8 +23,11 @@ app.add_middleware(
 @app.get("/analysis/{location}")
 def get_analysis(location: str):
     with db_conn.connect() as conn:
-        query = text("select * from analysis_runs")
+        query = text("select * from analysis_runs where location :loc")
         result = conn.execute(query, {"loc": location}).mappings().first()
+
+        if result is None:
+            raise HTTPException(status_code=404, detail="Analysis data not found")
 
         data = dict(result)
 

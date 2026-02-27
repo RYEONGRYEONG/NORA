@@ -10,8 +10,9 @@ def get_db():
     db_host = os.getenv('db_host')
     db_port = os.getenv('db_port')
     db_name = os.getenv('db_name')
-    
-    return create_engine(f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}')
+    db_url = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?ssl-mode=REQUIRED"
+
+    return create_engine(db_url)
 
 db_conn = get_db()
 
