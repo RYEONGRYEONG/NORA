@@ -26,11 +26,11 @@ const selectedCounty = counties.find(c => c.id === selectedId)
 return (
     // view box
     <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl">
-        <div className="bg-gray-200 p-4 border-b border-gray-300">
-            <h2 className="text-xl font-bold text-gray-800">Select field location</h2>
+        <div className="mb-6 text-center">
+            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
         </div>
 
-        <div className="flex flex-col md:flex-row p-8 gap-8 bg-white">
+        <div className="relative w-full flex justify-enter">
             <div className="w-full md:w-[60%] border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex items-center justify-center">
                 <svg 
                     viewBox="0 0 300 300" 
