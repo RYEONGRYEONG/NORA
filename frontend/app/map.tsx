@@ -78,7 +78,7 @@ return (
         </div>
         
          <button
-            onClick={() => selectedId === 'CW' && router.push(`/analysis/${selectedId}`)}
+            onClick={() => selectedId === 'CW' && router.push(`/analysis/Carlow`)}
             disabled={selectedId !== 'CW'}
             className = {`w-full py-6 rounded-2xl text-2xl font-bold transition-all shadow-xl
                     ${selectedId === 'CW'
