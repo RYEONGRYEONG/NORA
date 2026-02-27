@@ -13,9 +13,10 @@ export default function Map(){
 
     const clickCounty = (id: string) => {
         if (id === 'CO') {
-            alert("Cork region is currently under preparation. Please select Carlow.");
+            alert("We're sorry. Cork region is currently under preparation.");
             return;
         }
+
         setSelected(id);
 };
 
@@ -25,55 +26,67 @@ const selectedCounty = counties.find(c => c.id === selectedId)
 return (
     // view box
     <div className="flex flex-col items-center bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl">
-        <div className="mb-6 text-center">
-            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Select field location</h2>
+        <div className="bg-gray-200 p-4 border-b border-gray-300">
+            <h2 className="text-xl font-bold text-gray-800">Select field location</h2>
         </div>
 
-        <div className="relative w-full flex justify-enter py-4">
-            <svg 
-                viewBox="0 0 300 300" 
-                className="w-full h-auto drop-shadow-2xl transition-all duration-500"
-                xmlns="http://www.w3.org/2000/svg"
+        <div className="flex flex-col md:flex-row p-8 gap-8 bg-white">
+            <div className="w-full md:w-[60%] border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex items-center justify-center">
+                <svg 
+                    viewBox="0 0 300 300" 
+                    className="w-full h-auto max-h-[500px]"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+
+                    <g transform="matrix(0.3,0,0,0.3,0,0)">
+                        {counties.map((county) => (
+                            <path
+                                key={county.id}
+                                d={county.d}
+                                onClick={() => clickCounty(county.id)}
+                                className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
+                                    ${selectedId === county.id ? 'fill-blue-500' : 'fill-green-100 hover:fill-green-200'}'}`}
+                            />
+                        ))}
+                    </g>
+                </svg>
+            </div>
+
+        <div className = "w-full md:w-[40%] flex flex-col gap-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-sm min-h-[120px]">
+                        <p className = "text-blue-600 font-semibold mb-2">Selected Location</p>
+                        <h3 className = "text-4xl font-black text-gray-900 flex items-center gap-3">
+                            {selectedId === 'CW' ? (
+                                <>
+                                    <span className = "relative flex h-3 w-3">
+                                        <span className = "animate-ping absolute inline-flex h-full w-full bg-blue-400 opacity-75"></span>
+                                        <span className = "relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                                    </span>
+                                    Carlow
+                                </>
+                            ) : ( '-' )
+                            }
+                        </h3>
+            </div>
+
+            <div className = "flex-grow p-6 border border-dashed border-gray-300 rounded-xl flex items-center justify-center text-center">
+                    <p className="text-xs text-amber-600 font-medium bg-amber-50 py-1 px-3 rounded-full border border-amber-100">
+                        ⚠️ Note: Currently, analysis is optimised for the Carlow region only.
+                    </p>
+            </div>
+        
+            <button
+                onClick={() => selectedId === 'CW' && router.push('/analysis')}
+                disabled={selectedId !== 'CW'}
+                className = {`w-full py-5 rounded-2xl text-xl font-bold transition-all shadow-lg
+                    ${selectedId === 'CW'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
             >
-
-                <g transform="matrix(0.3,0,0,0.3,0,0)">
-                    {counties.map((county) => (
-                        <path
-                            key={county.id}
-                            d={county.d}
-                            onClick={() => clickCounty(county.id)}
-                            className={`cursor-pointer transition-all duration-300 stroke-white stroke-[2]
-                                ${selectedId === county.id ? 'fill-blue-500' : 'fill-slate-200 hover:fill-slate-300'}
-                                ${county.id === 'CO' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        />
-                    ))}
-                </g>
-            </svg>
+                Confirm Location
+            </button>
         </div>
-
-        <div className = "w-full mt-8 min-h-[120px] flex items-center justify-center">
-            {selectedId === 'CW' ? (
-                <div className = "w-full p-6 bg-blue-50 border border-blue-100 rouner-2xl flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className = "flex items-center gap-2 mb-3">
-                        <span className = "relative flex h-3 w-3">
-                            <span className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span className = "relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                        </span>
-                        <span className = "font-bold text-blue-900 text-lg">{selectedCounty?.name} Selected</span>
-                    </div>
-                    <button
-                        onClick={() => router.push('/analysis')}
-                        className = "w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition-all active:scale-95"
-                    >
-                        Confirm Location
-                    </button>
-                </div>
-            ) : (
-                <div className="text-slate-400 text-sm italic border-2 border-dashed border-slate-100 rounded-2xl p-8 w-full text-center">
-                    Select Carlow on the map to proceed
-                </div>
-            )}
-        </div>
+    </div>
     </div>
 );
 }
