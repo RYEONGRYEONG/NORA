@@ -8,8 +8,11 @@ from sign import sign_up, sign_in
 from sqlalchemy import text
 import json
 from fastapi import HTTPException
+from database import db_url
 
 app = FastAPI()
+
+print("db url: ", db_url)
 
 # allow the Next.js to communicate with FastAPI
 # FastAPI 8000 port / Next.js 3000 port
