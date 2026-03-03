@@ -15,17 +15,18 @@ const analysis = () => {
       .then(data => setAnalysisData(data));
   }, []);
 
-  if (!analysisData) return <div>Just for a moment...</div>;
+  if (!analysisData) return <div>Loading Analysis...</div>;
 
   const { metrics_json, risk_level, location } = analysisData;
 
   const febScenario = metrics_json.scenarios.find((s: any) => s.month === 2);
+  const current = metrics_json.current_metrics
 
   const chartData = {
     labels: metrics_json.labels, // ["Day 0", "Day 1", "Day 2", "Day 3"]
     datasets: [
       {
-        label: 'February Historical Scenario (SMD)',
+        label: 'February 2025 Historical SMD Trend',
         data: febScenario ? febScenario.trend : [], 
         borderColor: '#3498db', 
         backgroundColor: 'rgba(52, 152, 219, 0.2)',
@@ -36,7 +37,7 @@ const analysis = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '40px', fontFamily: 'Arial, sans-serif', maxWidth: '1000px', margin: '0 auto'}}>
       <h2>{location} Soil Risk Analysis</h2>
       
       <div style={{ 
@@ -53,8 +54,8 @@ const analysis = () => {
         <h3>Scenario Summary: February Case</h3>
         {febScenario && (
           <ul>
-            <li><strong>Past Rainfall (3d):</strong> {febScenario.historical_past_3} mm</li>
-            <li><strong>Scenario Event (4d):</strong> {febScenario.historical_fcst_4} mm</li>
+            <li><strong>Past Rainfall (3d):</strong> {febScenario.hist_past_3} mm</li>
+            <li><strong>Scenario Event (4d):</strong> {febScenario.hist_fcst_4} mm</li>
             <li><strong>Soil Condition:</strong> Poorly drained soil shows saturation.</li>
           </ul>
         )}
