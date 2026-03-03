@@ -20,6 +20,7 @@ const analysis = () => {
   const { metrics_json, risk_level, location } = analysisData;
 
   const febScenario = metrics_json.scenarios.find((s: any) => s.month === 2);
+  const targetDate = "2026-03-02"
   const current = metrics_json.current_metrics
 
   const chartData = {
@@ -40,6 +41,16 @@ const analysis = () => {
     <div style={{ padding: '40px', fontFamily: 'Arial, sans-serif', maxWidth: '1000px', margin: '0 auto'}}>
       <h2>{location} Soil Risk Analysis</h2>
       
+      <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '2px solid #ddd' }}>
+          <h3 style={{ marginTop: 0, color: '#2c3e50', borderBottom: '1px solid #eee' }}>Current Metrics ({targetDate})</h3>
+          <ul style={{ listStyle: 'none', padding: '10px 0', fontSize: '1.2rem', lineHeight: '1.8' }}>
+            <li><strong>Past Rainfall (3d):</strong> <span style={{ color: '#2980b9' }}>{current.past_3} mm</span></li>
+            <li><strong>Forecast (4d):</strong> <span style={{ color: '#2980b9' }}>{current.fcst_4} mm</span></li>
+            <li><strong>Status:</strong> Monitoring for saturation</li>
+          </ul>
+        </div>
+
+
       <div style={{ 
         padding: '10px', 
         backgroundColor: risk_level === 'High' ? '#e74c3c' : '#f39c12', 
@@ -54,8 +65,8 @@ const analysis = () => {
         <h3>Scenario Summary: February Case</h3>
         {febScenario && (
           <ul>
-            <li><strong>Past Rainfall (3d):</strong> {febScenario.hist_past_3} mm</li>
-            <li><strong>Scenario Event (4d):</strong> {febScenario.hist_fcst_4} mm</li>
+            <li><strong>Past Rainfall (3d):</strong> {febScenario.hist_past_3.toFixed(1)} mm</li>
+            <li><strong>Scenario Event (4d):</strong> {febScenario.hist_fcst_4.toFixed(1)} mm</li>
             <li><strong>Soil Condition:</strong> Poorly drained soil shows saturation.</li>
           </ul>
         )}
