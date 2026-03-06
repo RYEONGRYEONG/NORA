@@ -11,7 +11,7 @@ export default function Sign({ mode, onClose }: SignModal) {
   const [password, setPassword] = useState('');
   const [job, setJob] = useState('');
 
-  const URL = process.env.NEXT_PUBLIC_API_URL;
+  const URL = process.env.URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
