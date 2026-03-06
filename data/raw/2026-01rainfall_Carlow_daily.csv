@@ -19,7 +19,7 @@ evap:  -  Evaporation (mm)
 smd_wd:-  Soil Moisture Deficits(mm) well drained
 smd_md:-  Soil Moisture Deficits(mm) moderately drained
 smd_pd:-  Soil Moisture Deficits(mm) poorly drained
-glorad:-  Global Radiation (J/cm sq.)
+glorad:-  Global Radiation (J/cm sq)
 ind:   -  Indicator (i)
 
 date,ind,maxtp,ind,mintp,igmin,gmin,ind,rain,cbl,wdsp,ind,hm,ind,ddhm,ind,hg,soil,pe,evap,smd_wd,smd_md,smd_pd,glorad
