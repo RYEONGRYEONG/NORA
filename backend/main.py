@@ -19,8 +19,9 @@ print(f"URL: ", {db_url})
 app.add_middleware(
     CORSMiddleware,
     allow_origins = ["*"],
+    allow_credentials=True,
     allow_methods=["*"], # get, post, delete
-    allow_headers=["*"], # auth token
+    allow_headers=["*"] # auth token
 )
 
 @app.get("/analysis/{location}")
