@@ -11,8 +11,10 @@ export default function Sign({ mode, onClose }: SignModal) {
   const [password, setPassword] = useState('');
   const [job, setJob] = useState('');
 
-  const URL = process.env.URL;
+  const URL = process.env.NEXT_PUBLIC_API_URL;
 
+  console.log("API URL:", URL);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -41,7 +43,7 @@ export default function Sign({ mode, onClose }: SignModal) {
       }
     } catch (error) {
       console.error("Connection error:", error);
-      alert("Cannot connect to the backend server. Check if FastAPI is running on port 8000.");
+      alert("Failed to reach to the backend");
     }
   };
 
