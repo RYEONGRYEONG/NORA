@@ -4,17 +4,18 @@ import { useState } from 'react';
 interface SignModal {
   mode: 'login' | 'register';
   onClose: () => void;
+  onLoginSuccess: (userData: any) => void;
 }
 
-export default function Sign({ mode, onClose }: SignModal) {
+export default function Sign({ mode, onClose, onLoginSuccess }: SignModal) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [job, setJob] = useState('');
 
   const URL = process.env.NEXT_PUBLIC_API_URL;
 
-  console.log("API URL:", URL);
-  
+  console.log("API URL:", URL)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -34,10 +35,13 @@ export default function Sign({ mode, onClose }: SignModal) {
       const result = await response.json();
 
       if (response.ok && result.success) {
+        if (mode == 'login'){
+          localStorage.setItem('user', JSON.stringify(result.user));
+          onLoginSuccess(result.user);
+        }
+
         alert(result.message); 
-        onClose(); 
-        
-    
+        onClose();  
       } else {
         alert(result.message || "Something went wrong");
       }
