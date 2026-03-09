@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect } from 'react';
@@ -13,24 +13,40 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-interface MapModal {
-  position: [number, number];
+function ClickHandler({ setPosition} : { setPosition: (pos: [number, number]) => void}){
+    useMapEvents({
+        click(e){
+            setPosition([e.latlng.lat, e.latlng.lng]);
+        },
+    });
+    return null;
 }
 
-export default function MapContent({ position }: MapModal) {
+interface MapModal {
+  position: [number, number];
+  setPosition: (pos: [number, number]) => void;
+  isSearch: boolean;
+}
+
+export default function MapContent({ position, setPosition, isSearch }: MapModal) {
   return (
     <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }} zoomControl={false}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <ClickHandler setPosition={setPosition} />
       <Marker position={position} />
-      <MapUpdater center={position} />
+      <MapUpdater center={position} isSearch={isSearch}/>
     </MapContainer>
   );
 }
 
-function MapUpdater({ center }: { center: [number, number] }) {
+function MapUpdater({ center, isSearch }: { center: [number, number], isSearch: boolean }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, 15);
-  }, [center, map]);
+    if (isSearch) {
+        map.flyTo(center, 15);
+    } else{
+        map.setView(center, map.getZoom());
+   }
+ }, [center, map, isSearch]);
   return null;
 }

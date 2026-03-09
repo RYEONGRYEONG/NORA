@@ -10,17 +10,19 @@ const MapComponent = dynamic(() => import('./mapComponent'), {
     loading: () => <div className="w-full h-full bg-slate-100 animate-pulse flex items-center justify-center text-slate-400">Loading Map...</div>
 });
 
-const OAK_PARK: [number, number] = [52.8365, -6.9341];
+const OAK_PARK: [number, number] = [52.841, -6.926];
 
 export default function Map() {
     const router = useRouter();
     const [position, setPosition] = useState<[number, number]>(OAK_PARK);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isSearch, setIsSearch] = useState(false);
 
     // Eircode 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSearch(true);
         if (!searchQuery) return;
 
         setIsLoading(true);
@@ -42,6 +44,11 @@ export default function Map() {
             setIsLoading(false);
         }
     };
+
+    const handleSetPosition = (pos: [number, number]) => {
+        setIsSearch(false);
+        setPosition(pos);
+    }
 
     return (
         <div className="flex flex-col lg:flex-row items-stretch justify-center gap-8 bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-6xl mx-auto">
@@ -76,7 +83,8 @@ export default function Map() {
 
                 {/* actual map section */}
                 <div className="relative w-full aspect-video lg:aspect-square rounded-2xl border border-slate-200 shadow-inner overflow-hidden z-0">
-                    <MapComponent position={position} />
+                    <MapComponent position={position} setPosition={setPosition} isSearch={isSearch}
+                    />
                 </div>
             </div>
 
