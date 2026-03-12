@@ -12,12 +12,6 @@ const CARLOW_BOUND = {
     maxLng: -6.49
 };
 
-// Leaflet
-const bounds: L.LatLngBoundsExpression = [
-    [CARLOW_BOUND.minLat, CARLOW_BOUND.minLng],
-    [CARLOW_BOUND.maxLat, CARLOW_BOUND.maxLng]
-];
-
 const DefaultIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
@@ -30,9 +24,13 @@ function ClickHandler({ setPosition} : { setPosition: (pos: [number, number]) =>
     useMapEvents({
         click(e){
             const { lat, lng } = e.latlng;
-            if( lat >= CARLOW_BOUND.minLat && lat <= CARLOW_BOUND.maxLat &&
-                lng >= CARLOW_BOUND.minLng && lng <= CARLOW_BOUND.maxLng
-            ) setPosition([e.latlng.lat, e.latlng.lng]);
+            const isInside = lat >= CARLOW_BOUND.minLat && lat <= CARLOW_BOUND.maxLat &&
+            lng >= CARLOW_BOUND.minLng && lng <= CARLOW_BOUND.maxLng;
+
+            if (isInside) {setPosition([lat,lng])}
+            else {
+                alert("Selection is outside the Carlow region. Please try again")
+            }
         },
     });
     return null;
@@ -46,10 +44,7 @@ interface MapModal {
 
 export default function MapContent({ position, setPosition, isSearch }: MapModal) {
   return (
-    <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }} zoomControl={false}
-    maxBounds = {bounds}
-    maxBoundsViscosity={1.0}
-    minZoom={10}>
+    <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }} zoomControl={false}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <ClickHandler setPosition={setPosition} />
       <Marker position={position} />
