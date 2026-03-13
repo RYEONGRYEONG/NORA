@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Sign from './sign'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 
 export default function Navbar() {
   const router = useRouter();
@@ -35,13 +34,7 @@ export default function Navbar() {
     <header className="w-full py-6 px-10 bg-white border-b border-slate-200 flex justify-between items-center shadow-sm">
       <div className="flex items-center gap-10">
         <h1 className="text-2xl font-thin text-[#0782c5] tracking-tighter cursor-pointer" onClick={() => router.push('/')}>
-          <Image
-            src="/logo.png"
-            alt="NORA"
-            width={100} 
-            height={32}
-            className="object-contain"
-            />
+          NORA
         </h1>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-slate-500">
