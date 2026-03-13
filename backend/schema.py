@@ -15,3 +15,4 @@ class FarmSave(BaseModel):
     latitude: float
     longitude: float
     soil_condition: str
+    user_email: str

@@ -53,6 +53,10 @@ export default function Map() {
     };
 
     const handleSave = async () => {
+        const userJson = localStorage.getItem('user');
+        if (!userJson) return alert("Please login first.");
+        const user = JSON.parse(userJson);
+
         if (!farmName) return alert("Please enter your farm name.");
 
         setIsLoading(true);
@@ -65,7 +69,8 @@ export default function Map() {
                     location_name: "Carlow",
                     latitude: position[0],
                     longitude: position[1],
-                    soil_condition: soilCondition
+                    soil_condition: soilCondition,
+                    user_email: user.email
                 }),
             });
 

@@ -31,7 +31,8 @@ def save_farm(farm: schema.FarmSave):
                 "location": farm.location_name,
                 "lat": farm.latitude,
                 "lng": farm.longitude,
-                "soil": farm.soil_condition
+                "soil": farm.soil_condition,
+                "email": farm.user_email
             })
             conn.commit()
         return {"message": "Farm saved successfully!"}
