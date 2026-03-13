@@ -19,12 +19,12 @@ export default function Map() {
     const [isLoading, setIsLoading] = useState(false);
     const [isSearch, setIsSearch] = useState(false);
 
+    const URL = process.env.NEXT_PUBLIC_API_URL;
+    const endpoint = '/save-farm';
+
     const [farmName, setFarmName] = useState('');
-    const [locationName, setLocationName] = useState('Carlow');
     const [soilCondition, setSoilCondition] = useState('moderately');
     const [isSaved, setIsSaved] = useState(false);
-
-    const URL = process.env.NEXT_PUBLIC_API_URL;
 
     // Eircode 
     const handleSearch = async (e: React.FormEvent) => {
@@ -39,13 +39,8 @@ export default function Map() {
             const data = await res.json();
 
             if (data && data.length > 0) {
-                const { lat, lon, display_name } = data[0];
+                const { lat, lon } = data[0];
                 setPosition([parseFloat(lat), parseFloat(lon)]);
-
-                const parts = display_name.split(',');
-                const friendlyName = parts.length > 1 ? `${parts[0].trim()}, ${parts[1].trim()}` : "Carlow";
-                setLocationName(friendlyName);
-
             } else {
                 alert("Location not found. Please check the address or Eircode.");
             }
@@ -58,39 +53,38 @@ export default function Map() {
     };
 
     const handleSave = async () => {
-        if (!farmName) return alert("Please enter a farm name");
+        if (!farmName) return alert("Please enter your farm name.");
 
         setIsLoading(true);
-        const endpoint = '/save-farm'
         try {
             const response = await fetch(`${URL}${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: farmName,
-                location: locationName,
-                lat: position[0],
-                lng: position[1],
-                soil_condition: soilCondition
-            })
-        });
-        
-        if (response.ok) {
-            setIsSaved(true);
-            setTimeout(() => router.push("/my-farms"), 2000);
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    farm_name: farmName,
+                    location_name: "Carlow",
+                    latitude: position[0],
+                    longitude: position[1],
+                    soil_condition: soilCondition
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setIsSaved(true);
+                setTimeout(() => router.push('/my-farms'), 1500);
+            } else{
+                alert(result.message || "Failed to save farm.");
+            }
+        } catch (error){
+            console.error("Connection error: ", error);
+            alert("Failed to reach the backend.")
+        } finally {
+            setIsLoading(false);
         }
-    } catch (err){
-        alert("Save failed.");
-    } finally {
-        setIsLoading(false);
-    }
-};
-
-    const handleSetPosition = (pos: [number, number]) => {
-        setIsSearch(false);
-        setPosition(pos);
-    }
-
+    };
+        
     return (
         <div className="flex flex-col lg:flex-row items-stretch justify-center gap-8 bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-6xl mx-auto">
             
@@ -107,7 +101,7 @@ export default function Map() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input 
                             type="text" 
-                            placeholder="e.g. R00 X0V0 or SETU Carlow"
+                            placeholder="e.g. R00 X0V0 or SETU, Carlow"
                             className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -129,74 +123,80 @@ export default function Map() {
                 </div>
             </div>
 
-            {/* right: info confirm */}
+            {/* right section: info confirm */}
             <div className="flex-1 flex flex-col justify-between py-2 gap-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                    <p className="text-blue-600 font-bold text-xs uppercase mb-1">Current Selection</p>
-                    <h3 className="text-3xl font-black text-gray-900 flex items-center gap-3">{locationName}</h3>
-                    <div className="space-y-2 pt-4 border-t border-blue-100">
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Latitude:</span>
-                            <span className="text-2xl font-mono font-bold text-blue-700">{position[0].toFixed(5)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Longitude:</span>
-                            <span className="text-2xl font-mono font-bold text-blue-700">{position[1].toFixed(5)}</span>
+                <div className="space-y-6">
+                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
+                        <p className="text-blue-600 font-bold mb-4 text-xs tracking-widest uppercase">Target Region</p>
+                        <h3 className="text-3xl font-black text-gray-900 flex items-center gap-3">
+                            <Navigation className="text-blue-500" fill="currentColor" size={24} />
+                            Carlow
+                        </h3>
+                        <div className="mt-4 pt-4 border-t border-blue-100 space-y-2">
+                            <p className="text-xs text-slate-500 flex justify-between">
+                                <span>Latitude:</span> <span className="font-mono font-bold text-slate-700">{position[0].toFixed(5)}</span>
+                            </p>
+                            <p className="text-xs text-slate-500 flex justify-between">
+                                <span>Longitude:</span> <span className="font-mono font-bold text-slate-700">{position[1].toFixed(5)}</span>
+                            </p>
                         </div>
                     </div>
-                </div>      
 
                     <div className="p-5 border border-dashed border-amber-200 rounded-2xl bg-amber-50">
                         <p className="text-xs text-amber-700 font-medium leading-relaxed">
                             ⚠️ <b>Note:</b> NORA is currently optimised for the Carlow region. Weather forecast data will be fetched for your precise coordinates.
                         </p>
                     </div>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Farm Name</label>
-                    <input 
-                        className="w-full p-4 rounded-xl border border-slate-200"
-                        placeholder="e.g., Farm1"
-                        value={farmName}
-                        onChange={(e) => setFarmName(e.target.value)}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Soil Condition</label>
-                    <div className="grid grid-cols-3 gap-2">
-                        {['well', 'moderately', 'poorly'].map((cond) => (
-                            <button
-                                key={cond}
-                                onClick={() => setSoilCondition(cond)}
-                                className={`py-2 rounded-lg text-xs font-bold border transition-all ${
-                                    soilCondition === cond ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300'
-                                }`}
-                            >
-                                {cond.toUpperCase()}
-                            </button>
-                        ))}
+                
+                <div className="space-y-4 pt-2">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Farm Name</label>
+                            <input 
+                                type="text"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none text-sm transition-all"
+                                placeholder="Enter farm name"
+                                value={farmName}
+                                onChange={(e) => setFarmName(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Soil Drainage</label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {['well', 'moderately', 'poorly'].map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => setSoilCondition(type)}
+                                        className={`py-2 rounded-lg text-[10px] font-bold border transition-all ${
+                                            soilCondition === type 
+                                            ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
+                                            : 'bg-white border-slate-200 text-slate-400 hover:border-blue-200'
+                                        }`}
+                                    >
+                                        {type.toUpperCase()}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>      
+                </div>
 
-                <div className="mt-auto">
+                <div className="w-full">
                     {isSaved ? (
-                        <div className="bg-green-100 text-green-700 p-4 rounded-xl flex items-center justify-center gap-2 animate-pulse">
-                            <CheckCircle2 size={20} />
-                            <span className="font-bold">Successfully Saved to DB!</span>
+                        <div className="w-full py-5 rounded-2xl bg-green-500 text-white flex items-center justify-center gap-2 font-bold animate-pulse">
+                            <CheckCircle2 size={20} /> Saved successfully!
                         </div>
                     ) : (
                         <button
                             onClick={handleSave}
                             disabled={isLoading}
-                            className="w-full py-5 rounded-2xl text-xl font-bold bg-[#0782c5] hover:bg-[#0671ab] text-white transition-all flex items-center justify-center gap-2"
+                            className="w-full py-5 rounded-2xl text-xl font-bold bg-[#0782c5] hover:bg-[#0671ab] text-white shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                         >
-                            <MapPin size={24} />
-                            {isLoading ? 'Saving...' : 'Save to My Farms'}
+                            <MapPin size={20} />
+                            {isLoading ? 'Processing...' : 'Save to My Farms'}
                         </button>
                     )}
                 </div>
             </div>
+        </div>
     );
 }
