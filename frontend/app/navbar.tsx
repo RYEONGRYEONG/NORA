@@ -32,19 +32,19 @@ export default function Navbar() {
   };
 
   return (
-    <header className="w-full h-16 px-10 bg-white border-b border-slate-200 flex justify-between items-center shadow-sm sticky top-0 z-50">
+    <header className="w-full py-6 px-10 bg-white border-b border-slate-200 flex justify-between items-center shadow-sm">
       <div className="flex items-center gap-10">
-        <h1 className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
+        <h1 className="text-2xl font-thin text-[#0782c5] tracking-tighter cursor-pointer" onClick={() => router.push('/')}>
           <Image
             src="/logo.png"
             alt="NORA"
-            width={120}
-            height={40}
+            width={100} 
+            height={32}
             className="object-contain"
             />
         </h1>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-500">
+        <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-slate-500">
           <Link href="/historical" className="hover:text-[#0782c5] transition-colors">
           Historical
           </Link>
@@ -78,12 +78,12 @@ export default function Navbar() {
       <div className="flex gap-4">
         {user ? (
           <div className="flex gap-4 items-center">
-            <span className="text-slate-500 text-xs">
+            <span className="text-slate-600 font-medium text-sm">
               Welcome <span className="text-[#0782c5] font-bold">{user.email}</span>
             </span>
             <button
               onClick={handleLogout}
-              className="text-xs text-slate-400 hover:text-red-500 transition-colors"
+              className="text-sm text-slate-400 hover:text-red-500 transition-colors"
             >
               Logout
             </button>
