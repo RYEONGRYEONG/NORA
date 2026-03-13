@@ -10,8 +10,8 @@ class UserLogin(BaseModel):
     password: str
 
 class FarmSave(BaseModel):
-    name: str
-    location: str
-    lat: float
-    lng: float
+    farm_name: str
+    location_name: str
+    latitude: float
+    longitude: float
     soil_condition: str
