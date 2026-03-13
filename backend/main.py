@@ -25,7 +25,7 @@ app.add_middleware(
 def save_farm(farm: schema.FarmSave):
     try:
         with db_conn.connect() as conn:
-            query = text("insert into farms (farm_name, location_name, latitude, longitude, soil_condition) values (:name, :location, :lat, :lng, :soil)")
+            query = text("insert into farms (farm_name, location_name, latitude, longitude, soil_condition, user_email) values (:name, :location, :lat, :lng, :soil, :email)")
             conn.execute(query, {
                 "name": farm.farm_name,
                 "location": farm.location_name,
