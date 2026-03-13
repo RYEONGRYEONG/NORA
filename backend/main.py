@@ -12,8 +12,6 @@ from database import db_url, db_conn
 
 app = FastAPI()
 
-print(f"URL: ", {db_url})
-
 # allow the Next.js to communicate with FastAPI
 # FastAPI 8000 port / Next.js 3000 port
 app.add_middleware(
@@ -22,6 +20,25 @@ app.add_middleware(
     allow_methods=["*"], # get, post, delete
     allow_headers=["*"] # auth token
 )
+
+@app.post("/save-farm")
+def save_farm(farm: schema.Farmsave):
+    try:
+        with db_conn.connect() as conn:
+            query = text("insert into farms (name, location, lat, lng, soil_condition) values (:name, :location, :lat, :lng, :soil")
+            conn.execute(query, {
+                "name": farm.name,
+                "location": farm.location,
+                "lat": farm.lat,
+                "lng": farm.lng,
+                "soil": farm.soil_condition
+            })
+            conn.commit()
+        return {"message": "Farm saved successfully!"}
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Database save failed")
+                         
 
 @app.get("/analysis/{location}")
 def get_analysis(location: str):

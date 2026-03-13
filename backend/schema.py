@@ -8,3 +8,10 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+class FarmSave(BaseModel):
+    name: str
+    location: str
+    lat: float
+    lng: float
+    soil_condition: str

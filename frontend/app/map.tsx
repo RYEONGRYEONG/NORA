@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, Navigation } from 'lucide-react';
+import { Search, MapPin, Navigation, CheckCircle2 } from 'lucide-react';
 
 const MapComponent = dynamic(() => import('./mapComponent'), { 
     ssr: false,
@@ -19,6 +19,13 @@ export default function Map() {
     const [isLoading, setIsLoading] = useState(false);
     const [isSearch, setIsSearch] = useState(false);
 
+    const [farmName, setFarmName] = useState('');
+    const [locationName, setLocationName] = useState('Carlow');
+    const [soilCondition, setSoilCondition] = useState('moderately');
+    const [isSaved, setIsSaved] = useState(false);
+
+    const URL = process.env.NEXT_PUBLIC_API_URL;
+
     // Eircode 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,8 +39,13 @@ export default function Map() {
             const data = await res.json();
 
             if (data && data.length > 0) {
-                const { lat, lon } = data[0];
+                const { lat, lon, display_name } = data[0];
                 setPosition([parseFloat(lat), parseFloat(lon)]);
+
+                const parts = display_name.split(',');
+                const friendlyName = parts.length > 1 ? `${parts[0].trim()}, ${parts[1].trim()}` : "Carlow";
+                setLocationName(friendlyName);
+
             } else {
                 alert("Location not found. Please check the address or Eircode.");
             }
@@ -44,6 +56,35 @@ export default function Map() {
             setIsLoading(false);
         }
     };
+
+    const handleSave = async () => {
+        if (!farmName) return alert("Please enter a farm name");
+
+        setIsLoading(true);
+        const endpoint = '/save-farm'
+        try {
+            const response = await fetch(`${URL}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: farmName,
+                location: locationName,
+                lat: position[0],
+                lng: position[1],
+                soil_condition: soilCondition
+            })
+        });
+        
+        if (response.ok) {
+            setIsSaved(true);
+            setTimeout(() => router.push("/my-farms"), 2000);
+        }
+    } catch (err){
+        alert("Save failed.");
+    } finally {
+        setIsLoading(false);
+    }
+};
 
     const handleSetPosition = (pos: [number, number]) => {
         setIsSearch(false);
@@ -66,7 +107,7 @@ export default function Map() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input 
                             type="text" 
-                            placeholder="e.g. R93 E2R7 or College St, Carlow"
+                            placeholder="e.g. R00 X0V0 or SETU Carlow"
                             className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -90,22 +131,20 @@ export default function Map() {
 
             {/* right: info confirm */}
             <div className="flex-1 flex flex-col justify-between py-2 gap-6">
-                <div className="space-y-6">
-                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
-                        <p className="text-blue-600 font-bold mb-4 text-xs tracking-widest uppercase">Target Region</p>
-                        <h3 className="text-3xl font-black text-gray-900 flex items-center gap-3">
-                            <Navigation className="text-blue-500" fill="currentColor" size={24} />
-                            Carlow
-                        </h3>
-                        <div className="mt-4 pt-4 border-t border-blue-100 space-y-2">
-                            <p className="text-xs text-slate-500 flex justify-between">
-                                <span>Latitude:</span> <span className="font-mono font-bold text-slate-700">{position[0].toFixed(5)}</span>
-                            </p>
-                            <p className="text-xs text-slate-500 flex justify-between">
-                                <span>Longitude:</span> <span className="font-mono font-bold text-slate-700">{position[1].toFixed(5)}</span>
-                            </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                    <p className="text-blue-600 font-bold text-xs uppercase mb-1">Current Selection</p>
+                    <h3 className="text-3xl font-black text-gray-900 flex items-center gap-3">{locationName}</h3>
+                    <div className="space-y-2 pt-4 border-t border-blue-100">
+                        <div className="flex justify-between">
+                            <span className="text-slate-500">Latitude:</span>
+                            <span className="text-2xl font-mono font-bold text-blue-700">{position[0].toFixed(5)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-slate-500">Longitude:</span>
+                            <span className="text-2xl font-mono font-bold text-blue-700">{position[1].toFixed(5)}</span>
                         </div>
                     </div>
+                </div>      
 
                     <div className="p-5 border border-dashed border-amber-200 rounded-2xl bg-amber-50">
                         <p className="text-xs text-amber-700 font-medium leading-relaxed">
@@ -113,15 +152,51 @@ export default function Map() {
                         </p>
                     </div>
                 </div>
-                
-                <button
-                    onClick={() => router.push(`/analysis/Carlow?lat=${position[0]}&lng=${position[1]}`)}
-                    className="w-full py-5 rounded-2xl text-xl font-bold bg-[#0782c5] hover:bg-[#0671ab] text-white shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                    <MapPin size={20} />
-                    Confirm your location
-                </button>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Farm Name</label>
+                    <input 
+                        className="w-full p-4 rounded-xl border border-slate-200"
+                        placeholder="e.g., Farm1"
+                        value={farmName}
+                        onChange={(e) => setFarmName(e.target.value)}
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Soil Condition</label>
+                    <div className="grid grid-cols-3 gap-2">
+                        {['well', 'moderately', 'poorly'].map((cond) => (
+                            <button
+                                key={cond}
+                                onClick={() => setSoilCondition(cond)}
+                                className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                                    soilCondition === cond ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300'
+                                }`}
+                            >
+                                {cond.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+                </div>      
+
+                <div className="mt-auto">
+                    {isSaved ? (
+                        <div className="bg-green-100 text-green-700 p-4 rounded-xl flex items-center justify-center gap-2 animate-pulse">
+                            <CheckCircle2 size={20} />
+                            <span className="font-bold">Successfully Saved to DB!</span>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={handleSave}
+                            disabled={isLoading}
+                            className="w-full py-5 rounded-2xl text-xl font-bold bg-[#0782c5] hover:bg-[#0671ab] text-white transition-all flex items-center justify-center gap-2"
+                        >
+                            <MapPin size={24} />
+                            {isLoading ? 'Saving...' : 'Save to My Farms'}
+                        </button>
+                    )}
+                </div>
             </div>
-        </div>
     );
 }
