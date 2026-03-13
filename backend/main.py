@@ -27,10 +27,10 @@ def save_farm(farm: schema.FarmSave):
         with db_conn.connect() as conn:
             query = text("insert into farms (farm_name, location_name, latitude, longitude, soil_condition) values (:name, :location, :lat, :lng, :soil")
             conn.execute(query, {
-                "name": farm.name,
-                "location": farm.location,
-                "lat": farm.lat,
-                "lng": farm.lng,
+                "name": farm.farm_name,
+                "location": farm.location_name,
+                "lat": farm.latitude,
+                "lng": farm.longitude,
                 "soil": farm.soil_condition
             })
             conn.commit()
