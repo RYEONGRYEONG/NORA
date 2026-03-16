@@ -51,6 +51,7 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             "wind_speed": val.get('wind_speed'),
             "wind_gust": val.get('wind_dir'),
             "wind_dir": val.get('wind_dir'),
+            "humidity": val.get('humidity'),
             "dew": val.get('dew_point'),
             "press": val.get('pressure'),
             "rad": val.get('global_rad'),
