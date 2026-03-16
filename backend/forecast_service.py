@@ -63,7 +63,7 @@ def update_farm_forecast(farm_id, lat, lon, conn):
                      insert into forecast (farm_id, forecast_time, temp, precip, humidity, wind_speed, wind_gust, wind_dir, dew_point, pressure, global_rad, symbol_id)
                      values (:farm_id, :time, :temp, :precip, :humidity, :wind_speed, :wind_gust, :wind_dir, :dew, :press, :rad, :sym)
                      on duplicate key update
-                     temp = values(temp), precip = values(precip) humidity = values(humidity), wind_speed = values(wind_speed), wind_gust = values(wind_gust),
+                     temp = values(temp), precip = values(precip), humidity = values(humidity), wind_speed = values(wind_speed), wind_gust = values(wind_gust),
                      wind_dir = values(wind_dir), dew_point = values(dew_point), pressure = values(pressure), global_rad = values(global_rad), symbol_id = values(symbol_id)
                      """)
         
