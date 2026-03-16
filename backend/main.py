@@ -9,6 +9,7 @@ from sqlalchemy import text
 import json
 from fastapi import HTTPException
 from database import db_url, db_conn
+from forecast_service import update_farm_forecast
 
 app = FastAPI()
 
@@ -25,40 +26,31 @@ app.add_middleware(
 def save_farm(farm: schema.FarmSave):
     try:
         with db_conn.connect() as conn:
-            query = text("insert into farms (farm_name, location_name, latitude, longitude, soil_condition, user_email) values (:name, :location, :lat, :lng, :soil, :email)")
-            conn.execute(query, {
+
+            reset_query = text("update farms set is_default = 0 where user_email = :email")
+            conn.execute(reset_query, {"email": farm.user_email})
+
+            query = text("""insert into farms (farm_name, location_name, latitude, longitude, soil_condition, user_email, user_email, is_default) 
+                        values (:name, :location, :lat, :lng, :soil, :email, 1)""")
+            result = conn.execute(query, {
                 "name": farm.farm_name,
                 "location": farm.location_name,
                 "lat": farm.latitude,
                 "lng": farm.longitude,
                 "soil": farm.soil_condition,
                 "email": farm.user_email
-            })
+                })
+            
+            farm_id = result.lastrowid
+
+            update_farm_forecast(farm_id, farm.latitude, farm.longitude, conn)
+            
             conn.commit()
         return {"message": "Farm saved successfully!"}
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Database save failed")
                          
-
-@app.get("/analysis/{location}")
-def get_analysis(location: str):
-    with db_conn.connect() as conn:
-        query = text("select * from analysis_runs where location = :loc")
-        result = conn.execute(query, {"loc": location}).mappings().first()
-
-        if result is None:
-            raise HTTPException(status_code=404, detail="Analysis data not found")
-
-        data = dict(result)
-
-        if data.get('metrics_json'):
-            data['metrics_json'] = json.loads(data['metrics_json'])
-        
-        if data.get('forecast_issued_at'):
-            data['forecast_issued_at'] = data['forecast_issued_at'].isoformat()
-
-        return data
     
 @app.post("/register")
 def register(user: schema.UserRegister):
