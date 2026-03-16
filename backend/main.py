@@ -30,7 +30,7 @@ def save_farm(farm: schema.FarmSave):
             reset_query = text("update farms set is_default = 0 where user_email = :email")
             conn.execute(reset_query, {"email": farm.user_email})
 
-            query = text("""insert into farms (farm_name, location_name, latitude, longitude, soil_condition, user_email, user_email, is_default) 
+            query = text("""insert into farms (farm_name, location_name, latitude, longitude, soil_condition, user_email, is_default) 
                         values (:name, :location, :lat, :lng, :soil, :email, 1)""")
             result = conn.execute(query, {
                 "name": farm.farm_name,
