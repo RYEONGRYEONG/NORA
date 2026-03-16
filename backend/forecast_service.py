@@ -57,7 +57,6 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             val.get('symbol_id')
         ))
 
-    cursor = conn.cursor()
     try:
         query = """
             insert into forecast
@@ -75,7 +74,7 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             global_rad = VALUES(global_rad),
             symbol_id = VALUES(symbol_id);
         """
-        cursor.executemany(query, db_data)
+        conn.execute(query, db_data)
         conn.commit()
         print(f"{farm_id} forecast updated successfully")
     except Exception as e:
@@ -83,7 +82,7 @@ def update_farm_forecast(farm_id, lat, lon, conn):
         print(f"error: {e}")
         raise e
     finally:
-        cursor.close()
+        conn.close()
 
     df_hourly = pd.DataFrame(list(merged_forecasts.values()))
     df_hourly['forecast_time'] = pd.to_datetime(df_hourly['forecast_time'])
