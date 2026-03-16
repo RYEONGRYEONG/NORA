@@ -2,6 +2,7 @@ import pandas as pd
 import xmltodict
 import requests
 from datetime import datetime
+from sqlalchemy import text
 
 def update_farm_forecast(farm_id, lat, lon, conn):
     # Met Éireann API
@@ -42,47 +43,36 @@ def update_farm_forecast(farm_id, lat, lon, conn):
     
     db_data = []
     for val in merged_forecasts.values():
-        db_data.append((
-            val['farm_id'],
-            val['forecast_time'],
-            val.get('temp'),
-            val.get('precip', 0.0), 
-            val.get('humidity'),
-            val.get('wind_speed'),
-            val.get('wind_gust'),
-            val.get('wind_dir'),
-            val.get('dew_point'),
-            val.get('pressure'),
-            val.get('global_rad'),
-            val.get('symbol_id')
-        ))
-
+        db_data.append({
+            "farm_id": farm_id,
+            "time": val['forecast_time'],
+            "temp": val.get('temp'),
+            "precip": val.get('humidity'),
+            "wind_speed": val.get('wind_speed'),
+            "wind_gust": val.get('wind_dir'),
+            "wind_dir": val.get('wind_dir'),
+            "dew": val.get('dew_point'),
+            "press": val.get('pressure'),
+            "rad": val.get('global_rad'),
+            "sym": val.get('symbol_id')
+        })
+      
     try:
-        query = """
-            insert into forecast
-            (farm_id, forecast_time, temp, precip, humidity, wind_speed, wind_gust, wind_dir, dew_point, pressure, global_rad, symbol_id)
-            values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            on duplicate key update
-            temp = values(temp),
-            precip = values(precip),
-            humidity = values(humidity),
-            wind_speed = VALUES(wind_speed),
-            wind_gust = VALUES(wind_gust),
-            wind_dir = values(wind_dir),
-            dew_point = VALUES(dew_point),
-            pressure = VALUES(pressure),
-            global_rad = VALUES(global_rad),
-            symbol_id = VALUES(symbol_id);
-        """
+        query = text("""
+                     insert into forecast (farm_id, forecast_time, temp, precip, humidity, wind_speed, wind_gust, wind_dir, dew_point, pressure, global_rad, symbol_id)
+                     values (:farm_id, :time, :temp, :precip, :humidity, :wind_speed, :wind_gust, :wind_dir, :dew, :press, :rad, :sym)
+                     on duplicate key update
+                     temp = values(temp), precip = values(precip) humidity = values(humidity), wind_speed = values(wind_speed), wind_gust = values(wind_gust),
+                     wind_dir = values(wind_dir), dew_point = values(dew_point), pressure = values(pressure), global_rad = values(global_rad), symbol_id = values(symbol_id)
+                     """)
+        
         conn.execute(query, db_data)
-        conn.commit()
+
         print(f"{farm_id} forecast updated successfully")
     except Exception as e:
         conn.rollback()
         print(f"error: {e}")
         raise e
-    finally:
-        conn.close()
 
     df_hourly = pd.DataFrame(list(merged_forecasts.values()))
     df_hourly['forecast_time'] = pd.to_datetime(df_hourly['forecast_time'])

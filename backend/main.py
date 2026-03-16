@@ -32,6 +32,7 @@ def save_farm(farm: schema.FarmSave):
 
             query = text("""insert into farms (farm_name, location_name, latitude, longitude, soil_condition, user_email, is_default) 
                         values (:name, :location, :lat, :lng, :soil, :email, 1)""")
+            
             result = conn.execute(query, {
                 "name": farm.farm_name,
                 "location": farm.location_name,
