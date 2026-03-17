@@ -5,7 +5,7 @@ from database import db_conn
 from processors.smd_processor import calculate_pe_from_obs, calculated_smd
 
 def obs_analysis(init_wd, init_md, init_pd, db_conn):
-# initial smd = 2026-02-28
+
     current_smd_wd = init_wd # well draiend
     current_smd_md = init_md # moderately drained
     current_smd_pd = init_pd # poorly drained
@@ -81,7 +81,7 @@ def save_results(df, conn):
                     'smd_pd': row['smd_pd'],
                     'date': row['date']
                 })
-        print(f"✅ {len(df)} succeed")
+        print(f"{len(df)} succeed")
     except Exception as e:
         print(f"error: {e}")
 
