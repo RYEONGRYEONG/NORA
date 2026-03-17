@@ -9,7 +9,7 @@ from sqlalchemy import text
 import json
 from fastapi import HTTPException
 from database import db_url, db_conn
-from forecast_service import update_farm_forecast
+from services.forecast_service import update_farm_forecast
 
 app = FastAPI()
 
