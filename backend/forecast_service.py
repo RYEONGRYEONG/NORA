@@ -47,9 +47,9 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             "farm_id": farm_id,
             "time": val['forecast_time'],
             "temp": val.get('temp'),
-            "precip": val.get('humidity'),
+            "precip": val.get('precip', 0.0),
             "wind_speed": val.get('wind_speed'),
-            "wind_gust": val.get('wind_dir'),
+            "wind_gust": val.get('wind_gust'),
             "wind_dir": val.get('wind_dir'),
             "humidity": val.get('humidity'),
             "dew": val.get('dew_point'),
@@ -74,23 +74,3 @@ def update_farm_forecast(farm_id, lat, lon, conn):
         conn.rollback()
         print(f"error: {e}")
         raise e
-
-    df_hourly = pd.DataFrame(list(merged_forecasts.values()))
-    df_hourly['forecast_time'] = pd.to_datetime(df_hourly['forecast_time'])
-    
-    
-    for col in ['temp', 'precip', 'wind_speed', 'global_rad', 'pressure', 'humidity']:
-        df_hourly[col] = pd.to_numeric(df_hourly[col], errors='coerce').fillna(0)
-
-    
-    df_daily = df_hourly.resample('D', on='forecast_time').agg({
-        'temp': ['mean', 'max', 'min'],
-        'pressure': 'mean',
-        'precip': 'sum',
-        'wind_speed': 'mean',
-        'humidity': 'mean',
-        'global_rad': 'sum'
-    }).dropna()
-    
-    df_daily.columns = ['mean_temp', 'max_temp', 'min_temp',  'wind_speed', 'pressure', 'humidity' , 'total_rad', 'rain']
-    return df_daily
