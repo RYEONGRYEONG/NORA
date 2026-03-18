@@ -5,7 +5,7 @@ def calculate_rain_risk(forecast_list, soil_type, target_date, past_rain_sum, da
     if past_rain_sum >= 10.0:
         return {"risk_level": "High", "score": 100, "reason": "Past rainfall exceeds 10mm, indicating saturated soil."}
     
-    if forecast_rain_sum >= 10.0 and 'poor' in soil_type:
+    if forecast_rain_sum >= 10.0 and 'poorly' in soil_type:
         return {"risk_level": "High", "score": 100, "reason": "Heavy rainfall (>=10mm) is forecasted on poorly drained soil."}
     
     # 2. near high
@@ -27,7 +27,7 @@ def calculate_rain_risk(forecast_list, soil_type, target_date, past_rain_sum, da
     else: forecast_score = 0
 
     # (3) soil type score
-    if 'poor' in soil_type: soil_score = 25
+    if 'poorly' in soil_type: soil_score = 25
     elif 'moderately' in soil_type: soil_score = 15
     else: soil_score = 5
 
