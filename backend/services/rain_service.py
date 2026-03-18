@@ -2,7 +2,7 @@ from datetime import timedelta
 from processors.rain_processor import calculate_rain_risk
 
 def is_heavy_rain(weather_list, soil_type, target_date):
-    if 'poor' in soil_type:
+    if 'poorly' in soil_type:
         days = 5
     elif 'moderately' in soil_type:
         days = 3
