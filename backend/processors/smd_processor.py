@@ -31,8 +31,9 @@ def calculate_pe_from_obs(row): # Pressure, humidity, dew_point Data X
     
     return max(0.0, num / den)
 
-def calculate_pe(mean_temp, max_temp, min_temp, wind_speed, pressure, humidity, total_rad_mj):
+def calculate_pe_forecast(mean_temp, max_temp, min_temp, wind_speed, pressure, humidity, total_rad_mj):
 
+    wind_speed_ms = max(0, wind_speed * 0.5144)
     rn = 0.75 * total_rad_mj
 
     es_tmax = 0.6108 * math.exp((17.27 * max_temp) / (max_temp + 237.3))
