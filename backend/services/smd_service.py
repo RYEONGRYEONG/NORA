@@ -2,7 +2,46 @@ import pandas as pd
 import math
 from sqlalchemy import text
 from database import db_conn
-from processors.smd_processor import calculate_pe_from_obs, calculated_smd
+from processors.smd_processor import calculate_pe_from_obs, calculated_smd, calculate_pe_forecast
+
+def get_smd_status(weather_list, soil_type, target_date):
+    yesterday_data = weather_list[0]
+
+    smd_col = f"smd_{'wd' if 'well' in soil_type else 'md' if 'moderately' in soil_type else 'pd'}"
+    
+    current_smd = yesterday_data.get(smd_col, 0.0)
+    forecast_days = [item for item in weather_list if item['date'] >= yesterday_data['date'] + timedelta(days=1)]
+    final_smd = current_smd
+
+    for day_data in forecast_days:
+        pe = calculate_pe_forecast(
+            max_temp = day_data['maxtp'],
+            min_temp = day_data['mintp'],
+            mean_tmep = day_data['meantp'],
+            wind_speed = day_data['wdsp'],
+            pressure = day_data['cbl'],
+            humidity = day_data['humidity'],
+            total_rad_mj = day_data['glorad'] / 100.0
+        )
+
+        _, next_smd, _ = calculated_smd(final_smd, pe, day_data['rain'], soil_type)
+        final_smd = next_smd
+
+        if day_data['date'] == target_date:
+            break
+
+    if final_smd < 0:
+        risk_level = "High"
+    elif final_smd < 10:
+        risk_level = "Medium"
+    else:
+        risk_level = "Low"
+
+    return {
+        "risk_level": risk_level,
+        "smd_value": final_smd
+    }
+
 
 def obs_analysis(init_wd, init_md, init_pd, db_conn):
 
@@ -12,7 +51,7 @@ def obs_analysis(init_wd, init_md, init_pd, db_conn):
 
     query = text("""
              select date, maxtp, mintp, wdsp, glorad, rain
-             from obs_hist where date = '2026-03-16'
+             from obs_hist where date = '2026-03-17'
              order by date
                  """)
     
