@@ -1,18 +1,18 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  
-  // test
-  const [currentFarm] = useState({
-    id: 1,
-    name: "Ardee Farm",
-    location: "Louth, Ireland",
-    soil: "Poorly Drained"
-  })
+  const [currentFarm, setCurrentFarm] = useState<any>(null);
+
+  useEffect(() => {
+    const savedFarm = localStorage.getItem('selectedFarm');
+    if (savedFarm) {
+      setCurrentFarm(JSON.parse(savedFarm));
+    }
+  }, [pathname]);
 
   return (
     <div className="flex min-h-[calc(100vh-88px)] bg-slate-50">

@@ -24,6 +24,37 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
+# main.py 추가 코드
+
+@app.get("/api/farms")
+def get_my_farms(email: str):
+    try:
+        with db_conn.connect() as conn:
+            query = text("""
+                select id, farm_name, location_name, latitude, longitude, soil_condition, is_default 
+                from farms 
+                where user_email = :email
+            """)
+            result = conn.execute(query, {"email": email}).fetchall()
+            
+            farms = []
+            for row in result:
+                farms.append({
+                    "id": row[0],
+                    "farm_name": row[1],
+                    "location_name": row[2],
+                    "latitude": row[3],
+                    "longitude": row[4],
+                    "soil_condition": row[5],
+                    "is_default": row[6]
+                })
+            
+            return farms
+            
+    except Exception as e:
+        print(f"Fetch Farms Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch farms")
+
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
     try:

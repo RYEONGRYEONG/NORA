@@ -11,20 +11,16 @@ export default function RiskAnalyserPage() {
     const checkDate = dateToUse || targetDate
     if (!checkDate) return alert("Please select a target date.")
 
-    // const savedFarm = localStorage.getItem('selectedFarm');
-    //if (!savedFarm) {
-      //alert("Please select a farm from the 'My Farms' menu first.");
-      //return;
-    //}
-    //const farmId = JSON.parse(savedFarm).id;
-
-    // test
-    const farmId = 13;
-    const target_date = "2026-03-22";
+    const savedFarm = localStorage.getItem('selectedFarm');
+    if (!savedFarm) {
+      alert("Please select a farm from the 'My Farms' menu first.");
+      return;
+    }
+    const farmId = JSON.parse(savedFarm).id;
 
     setLoading(true)
     try {
-        const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${target_date}`, {
+        const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${checkDate}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });

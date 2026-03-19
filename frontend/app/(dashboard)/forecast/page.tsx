@@ -1,5 +1,3 @@
-// frontend/app/(dashboard)/forecast/page.tsx
-
 export default function ForecastPage() {
   return (
     <div className="p-10">
