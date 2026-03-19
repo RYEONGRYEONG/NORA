@@ -18,7 +18,7 @@ def get_smd_status(weather_list, soil_type, target_date):
         pe = calculate_pe_forecast(
             max_temp = day_data['maxtp'],
             min_temp = day_data['mintp'],
-            mean_tmep = day_data['meantp'],
+            mean_temp = day_data['meantp'],
             wind_speed = day_data['wdsp'],
             pressure = day_data['cbl'],
             humidity = day_data['humidity'],
