@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   
-  // 임시 농장 데이터 (나중엔 전역 상태나 DB에서 가져옵니다)
+  // test
   const [currentFarm] = useState({
     id: 1,
     name: "Ardee Farm",
@@ -23,9 +23,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="bg-[#0782c5]/5 p-6 rounded-2xl border border-[#0782c5]/10 mb-8">
           <p className="text-2xl font-black text-slate-800 mb-1">{currentFarm.name}</p>
           <p className="text-sm text-slate-500 flex items-center gap-1 mb-4">📍 {currentFarm.location}</p>
-          <span className="inline-block px-3 py-1 bg-[#0782c5] text-white text-xs rounded-full font-bold">
+          {/* <span className="inline-block px-3 py-1 bg-[#0782c5] text-white text-xs rounded-full font-bold">
             {currentFarm.soil}
-          </span>
+          </span> */}
         </div>
 
         <nav className="flex flex-col gap-2">
