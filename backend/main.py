@@ -7,9 +7,11 @@ from database import db_conn
 from sign import sign_up, sign_in
 from sqlalchemy import text
 import json
+from datetime import date
 from fastapi import HTTPException
 from database import db_url, db_conn
 from services.forecast_service import update_farm_forecast
+from processors.final_risk_analysis import final_analysis
 
 app = FastAPI()
 
@@ -21,6 +23,19 @@ app.add_middleware(
     allow_methods=["*"], # get, post, delete
     allow_headers=["*"] # auth token
 )
+
+@app.get("/risk-analyser")
+def risk_analysis(farm_id: int, target_date: str):
+    try:
+        parsed_date = date.fromisoformat(target_date)
+        
+        result = final_analysis(db_conn, farm_id, parsed_date)
+        
+        return result
+    
+    except Exception as e:
+        print(f"Analysis Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/save-farm")
 def save_farm(farm: schema.FarmSave):
@@ -50,8 +65,7 @@ def save_farm(farm: schema.FarmSave):
         return {"message": "Farm saved successfully!"}
     except Exception as e:
         print(f"Error: {e}")
-        raise HTTPException(status_code=500, detail="Database save failed")
-                         
+        raise HTTPException(status_code=500, detail="Database save failed")  
     
 @app.post("/register")
 def register(user: schema.UserRegister):
