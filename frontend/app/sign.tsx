@@ -14,8 +14,6 @@ export default function Sign({ mode, onClose, onLoginSuccess }: SignModal) {
 
   const URL = process.env.NEXT_PUBLIC_API_URL;
 
-  console.log("API URL:", URL)
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
