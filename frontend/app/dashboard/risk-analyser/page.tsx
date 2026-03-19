@@ -24,7 +24,7 @@ export default function RiskAnalyserPage() {
 
     setLoading(true)
     try {
-        const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${checkDate}`, {
+        const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${target_date}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
