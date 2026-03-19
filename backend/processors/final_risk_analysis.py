@@ -71,6 +71,7 @@ def final_analysis(db_conn, farm_id, target_date):
             return alt_result
 
     # if no safe days are found
-    first_check['message'] = f"{target_date} is high-risk, and there are no suitable alternative dates within 10-day forecast."
+    current_risk = first_check['final_risk']
+    first_check['message'] = f"{target_date} is f{current_risk}, and there are no suitable alternative dates within 10-day forecast."
     first_check['recommended_date'] = None
     return first_check
