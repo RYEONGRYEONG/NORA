@@ -46,7 +46,6 @@ export default function MyFarmsPage() {
   const handleSelectFarm = (farm: any) => {
     localStorage.setItem('selectedFarm', JSON.stringify(farm))
     setCurrentFarmId(farm.id)
-    router.push('/risk-analyser')
   }
 
   const handleDeleteFarm = async (farmId: number) => {

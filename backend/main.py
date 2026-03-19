@@ -24,8 +24,6 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
-# main.py 맨 아래쪽에 추가하세요!
-
 @app.delete("/api/farms/{farm_id}")
 def delete_farm(farm_id: int):
     try:
