@@ -42,7 +42,7 @@ def final_analysis(db_conn, farm_id, target_date):
         # (3) call get_matrix_risk
         rain_risk = rain_report['risk_level']
         final_risk = get_matrix_risk(smd_risk, rain_risk)
-        
+    
         return {
             "final_risk": final_risk,
             "smd_risk": smd_risk,
