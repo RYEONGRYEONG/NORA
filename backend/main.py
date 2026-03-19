@@ -24,7 +24,25 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
-# main.py 추가 코드
+# main.py 맨 아래쪽에 추가하세요!
+
+@app.delete("/api/farms/{farm_id}")
+def delete_farm(farm_id: int):
+    try:
+        with db_conn.connect() as conn:
+            query = text("delete from farms WHERE id = :farm_id")
+            result = conn.execute(query, {"farm_id": farm_id})
+            
+            conn.commit()
+            
+            if result.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Farm not found")
+                
+            return {"success": True, "message": f"Farm {farm_id} deleted successfully"}
+
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error during deletion")
 
 @app.get("/api/farms")
 def get_my_farms(email: str):
