@@ -24,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
-@app.get("/api/risk-analyser")
+@app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
     try:
         parsed_date = date.fromisoformat(target_date)
