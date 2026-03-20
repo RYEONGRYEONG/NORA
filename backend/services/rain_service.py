@@ -15,6 +15,7 @@ def is_heavy_rain(weather_list, soil_type, target_date):
 
     past_rain_sum = sum(item['rain'] for item in weather_list if start <= item['date'] <= end)
     
+    # Filter forecasted weather from the target date onwards
     forecast_list = [item for item in weather_list if item['date'] >= target_date]
 
     if not forecast_list:
