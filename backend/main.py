@@ -7,7 +7,7 @@ from database import db_conn
 from sign import sign_up, sign_in
 from sqlalchemy import text
 import json
-from datetime import date
+from datetime import date, datetime
 from fastapi import HTTPException
 from database import db_url, db_conn
 from services.forecast_service import update_farm_forecast
@@ -73,10 +73,15 @@ def get_my_farms(email: str):
 
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
-    try:
-        parsed_date = date.fromisoformat(target_date)
+    
+    try: # e.g, "2026-03-20"
+        parsed_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+        
+    except ValueError: # e.g, "03/20/2026"
+        parsed_date = datetime.strptime(target_date, '%m/%d/%Y').date()
         
         result = final_analysis(db_conn, farm_id, parsed_date)
+        print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}")
         
         return result
     
