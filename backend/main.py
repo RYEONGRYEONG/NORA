@@ -81,7 +81,7 @@ def risk_analysis(farm_id: int, target_date: str):
         parsed_date = datetime.strptime(target_date, '%m/%d/%Y').date()
         
         result = final_analysis(db_conn, farm_id, parsed_date)
-        print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}")
+        print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}", flush=True)
         
         return result
     
