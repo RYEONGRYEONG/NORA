@@ -79,12 +79,13 @@ def risk_analysis(farm_id: int, target_date: str):
         
     except ValueError: # e.g, "03/20/2026"
         parsed_date = datetime.strptime(target_date, '%m/%d/%Y').date()
-        
+
+    print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}", flush=True)    
+
+    try:
         result = final_analysis(db_conn, farm_id, parsed_date)
-        print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}", flush=True)
-        
         return result
-    
+
     except Exception as e:
         print(f"Analysis Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
