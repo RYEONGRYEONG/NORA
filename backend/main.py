@@ -24,6 +24,25 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
+@app.post("/api/farms/select/{farm_id}")
+def select_and_sync_farm(farm_id: int):
+    try:
+        with db_conn.connect() as conn:
+            farm_query = text("select latitude, longitude from farms where id = :id")
+            farm = conn.execute(farm_query, {"id": farm_id}).fetchone()
+            
+            if not farm:
+                raise HTTPException(status_code=404, detail="Farm not found")
+            
+            update_farm_forecast(farm_id, farm[0], farm[1], conn)
+            
+            conn.commit()
+            return {"success": True, "message": "Forecast synced successfully"}
+            
+    except Exception as e:
+        print(f"Sync Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to sync forecast")
+
 @app.delete("/api/farms/{farm_id}")
 def delete_farm(farm_id: int):
     try:
