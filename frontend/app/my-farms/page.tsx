@@ -43,9 +43,21 @@ export default function MyFarmsPage() {
     fetchFarms()
   }, [URL, router])
 
-  const handleSelectFarm = (farm: any) => {
+  const handleSelectFarm = async (farm: any) => {
     localStorage.setItem('selectedFarm', JSON.stringify(farm))
     setCurrentFarmId(farm.id)
+
+    try {
+      const res = await fetch(`${URL}/api/farms/select/${farm.id}`, { 
+      method: 'POST' 
+    })
+
+    if (res.ok){
+      console.log("Forecast synced for farm:", farm.id)
+    }
+    } catch (error) {
+      console.error("Sync error:", error)
+    }
   }
 
   const handleDeleteFarm = async (farmId: number) => {
