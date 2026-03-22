@@ -97,7 +97,7 @@ def obs_analysis(init_wd, init_md, init_pd, db_conn):
         print(f"error: {e}")
         return None
 
-def save_results(df, conn):
+def save_results(df, db_conn):
     if df is None or df.empty:
         print("No Data Found")
         return
