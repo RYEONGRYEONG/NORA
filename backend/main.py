@@ -93,15 +93,20 @@ def get_my_farms(email: str):
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
     
-    try: # e.g, "2026-03-20"
-        parsed_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+    try: 
+        try: # e.g, "2026-03-20"
+            parsed_date = datetime.strptime(target_date, '%Y-%m-%d').date()
         
-    except ValueError: # e.g, "03/20/2026"
-        parsed_date = datetime.strptime(target_date, '%m/%d/%Y').date()
+        except ValueError: # e.g, "03/20/2026"
+            parsed_date = datetime.strptime(target_date, '%m/%d/%Y').date()
 
-    print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}", flush=True)    
+        print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}", flush=True)    
 
-    try:
+        with db_conn.connect() as conn:
+            farm = conn.execute(text("select latitude, longitude from farms where id = :id"), {"id": farm_id}).fetchone()
+            update_farm_forecast(farm_id, farm[0], farm[1], conn)
+            conn.commit()
+
         result = final_analysis(db_conn, farm_id, parsed_date)
         return result
 
