@@ -9,7 +9,7 @@ def get_matrix_risk(smd_risk, rain_risk):
         ("Medium", "High"): "High", ("Medium", "Medium"): "Medium", ("Medium", "Low"): "Medium",
         ("Low", "High"): "Medium", ("Low", "Medium"): "Medium", ("Low", "Low"): "Low",
     }
-    return matrix.get((smd_risk, rain_risk), "Medium") # default: Medium
+    return matrix[(smd_risk, rain_risk)]
 
 # STEP 1
 def final_analysis(db_conn, farm_id, target_date):
@@ -60,7 +60,7 @@ def final_analysis(db_conn, farm_id, target_date):
 
     # if high-risk, search for an alternative date 
     today = date.today() 
-    for i in range(1, 11):
+    for i in range(1, 10):
         check_date = today + timedelta(days=i)
         if check_date == target_date: continue
             
