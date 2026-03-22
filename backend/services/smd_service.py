@@ -10,7 +10,7 @@ def get_smd_status(weather_list, soil_type, target_date):
 
     smd_col = f"smd_{'wd' if 'well' in soil_type else 'md' if 'moderately' in soil_type else 'pd'}"
     
-    current_smd = yesterday_data.get(smd_col, 0.0)
+    current_smd = yesterday_data.get(smd_col)
     forecast_days = [item for item in weather_list if item['date'] >= yesterday_data['date'] + timedelta(days=1)]
     final_smd = current_smd
 
