@@ -50,10 +50,9 @@ def calculate_pe_forecast(mean_temp, max_temp, min_temp, wind_speed, pressure, h
     pressure_kpa = pressure / 10
     gamma = 0.000665 * pressure_kpa
     
-    wind_speed = max(0, wind_speed)
-    wind_factor = 1 + 0.34 * max(0, wind_speed)
+    wind_factor = 1 + 0.34 * max(0, wind_speed_ms)
 
-    num = (0.408 * delta * rn) + (gamma * (900 / (mean_temp + 273)) * wind_speed * vpd)
+    num = (0.408 * delta * rn) + (gamma * (900 / (mean_temp + 273)) * wind_speed_ms * vpd)
     den = delta + (gamma * wind_factor)
         
     pe = num / den
