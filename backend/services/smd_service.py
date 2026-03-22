@@ -124,3 +124,8 @@ def save_results(df, db_conn):
         print(f"{len(df)} succeed")
     except Exception as e:
         print(f"error: {e}")
+
+    
+
+    
+    
