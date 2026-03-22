@@ -1,4 +1,4 @@
-def calculate_rain_risk(forecast_list, soil_type, target_date, past_rain_sum, days):
+def calculate_rain_risk(forecast_list, soil_type, past_rain_sum):
     forecast_rain_sum = sum(item['rain'] for item in forecast_list[:2])
 
     # 1. hard high
