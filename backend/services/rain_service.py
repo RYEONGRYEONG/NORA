@@ -24,7 +24,7 @@ def is_heavy_rain(weather_list, soil_type, target_date):
     return calculate_rain_risk(
         forecast_list = forecast_list,
         soil_type = soil_type,
-        target_date = target_date,
+        #target_date = target_date,
         past_rain_sum = past_rain_sum,
-        days = days
+        #days = days
     )
