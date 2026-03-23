@@ -9,8 +9,9 @@ export default function RiskAnalyserPage() {
   const today = new Date();
   const maxDate = new Date();
   maxDate.setDate(today.getDate() + 7);
-  const maxDateString = maxDate.toISOString().split('T')[0];
+  const maxDateString = maxDate.toISOString().split('T')[0]; // for JSON
 
+  const currentData = result?.full_demo_report?.find((day: any) => day.date === targetDate); 
   const handleAnalyse = async (dateToUse?: string) => {
     const checkDate = dateToUse || targetDate
     if (!checkDate) return alert("Please select a target date.")
@@ -33,7 +34,7 @@ export default function RiskAnalyserPage() {
 
         if (response.ok) {
         setResult(data);
-        if (dateToUse) setTargetDate(dateToUse); 
+        setTargetDate(checkDate); 
       } else {
         alert(data.detail || data.message || "Failed to analyse risk.");
       }
@@ -92,7 +93,6 @@ export default function RiskAnalyserPage() {
         <div className="bg-blue-50 border-2 border-blue-400 p-6 rounded-2xl flex justify-between items-center shadow-md animate-pulse">
           <div>
             <h3 className="text-blue-800 font-bold text-lg">Alternative Found</h3>
-            {/* detail messages */}
             <p className="text-blue-600 font-medium">{result.message}</p>
           </div>
           <button 
@@ -105,10 +105,10 @@ export default function RiskAnalyserPage() {
       )}
 
       {/* main */}
-      {result && (
-        <div className={`p-10 rounded-[32px] shadow-2xl transition-colors duration-500 ${riskColour(result.final_risk)}`}>
+      {result && currentData && (
+        <div className={`p-10 rounded-[32px] shadow-2xl transition-colors duration-500 ${riskColour(currentData.final_risk)}`}>
           <p className="text-sm font-bold uppercase tracking-widest opacity-80 mb-2">Final Assessment</p>
-          <h2 className="text-6xl font-black mb-4">{result.final_risk}</h2>
+          <h2 className="text-6xl font-black mb-4">{currentData.final_risk}</h2>
           
           {result.recommended_date === targetDate && (
             <p className="text-xl font-medium mb-8 opacity-90">{result.message}</p>
@@ -120,19 +120,19 @@ export default function RiskAnalyserPage() {
           <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/20">
             <div>
               <p className="text-xs font-bold opacity-70 uppercase mb-1">Rainfall Trigger</p>
-              <p className="text-2xl font-bold">{result.rain_risk}</p>
+              <p className="text-2xl font-bold">{currentData.rain_risk}</p>
               
-              {result.reason && <p className="text-sm mt-1 opacity-90">{result.reason}</p>}
+              {currentData.reason && <p className="text-sm mt-1 opacity-90">{currentData.reason}</p>}
           
               <div className="mt-3 text-sm opacity-90 bg-black/10 px-3 py-2 rounded-lg inline-block">
-                <p>Past (2d): <span className="font-black">{result.past_rain_sum} mm</span></p>
-                <p>Forecast (2d): <span className="font-black">{result.forecast_rain_sum} mm</span></p>
+                <p>Past (2d): <span className="font-black">{currentData.past_rain_sum} mm</span></p>
+                <p>Forecast (2d): <span className="font-black">{currentData.forecast_rain_sum} mm</span></p>
               </div>
             </div>
             <div>
               <p className="text-xs font-bold opacity-70 uppercase mb-1">Soil Moisture (SMD)</p>
-              <p className="text-2xl font-bold">{result.smd_value} mm</p>
-              <p className="text-sm mt-1 opacity-80">{result.smd_risk} Saturation</p>
+              <p className="text-2xl font-bold">{currentData.smd_value} mm</p>
+              <p className="text-sm mt-1 opacity-80">{currentData.smd_risk} Saturation</p>
             </div>
           </div>
         </div>
