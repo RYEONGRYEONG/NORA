@@ -5,9 +5,9 @@ from services.smd_service import get_smd_status
 
 def get_matrix_risk(smd_risk, rain_risk):
     matrix = {
-        ("High", "High"): "High", ("High", "Medium"): "High", ("High", "Low"): "Medium",
+        ("High", "High"): "High", ("High", "Medium"): "High", ("High", "Low"): "High",
         ("Medium", "High"): "High", ("Medium", "Medium"): "Medium", ("Medium", "Low"): "Medium",
-        ("Low", "High"): "Medium", ("Low", "Medium"): "Medium", ("Low", "Low"): "Low",
+        ("Low", "High"): "High", ("Low", "Medium"): "Medium", ("Low", "Low"): "Low",
     }
     return matrix[(smd_risk, rain_risk)]
 
@@ -38,7 +38,7 @@ def final_analysis(db_conn, farm_id, target_date):
     def evaluate_date(eval_date, w_list, s_type):
         # (1) call rain_service
         rain_report = is_heavy_rain(w_list, s_type, eval_date)
-        if "error" in rain_report: return {"final_risk": "Error", "details": rain_report}
+        if "error" in rain_report: return {"risk_level": "Error", "details": rain_report}
         
         # (2) call smd ervice 
         # smd_report = get_smd_status(w_list, s_type, eval_date)
@@ -64,11 +64,10 @@ def final_analysis(db_conn, farm_id, target_date):
     # STEP 2. evaluate the target_date first
     full_demo_report = []
     for i in range(0, 8):
-        check_date = today + timedelta(days=i)
-            
+        check_date = today + timedelta(days=i) 
         alt_result = evaluate_date(check_date, weather_list, soil_type)
         alt_result['date'] =  check_date.strftime("%Y-%m-%d")
-        full_demo_report.append(alt_result)
+        full_demo_report.append(alt_result) 
 
     target_date_str = target_date.strftime("%Y-%m-%d")
     first_check = next((item for item in full_demo_report if item['date'] == target_date_str), None)
