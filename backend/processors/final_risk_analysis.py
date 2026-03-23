@@ -27,7 +27,7 @@ def final_analysis(db_conn, farm_id, target_date):
             return {"error": f"Search available up to {max_allowed_date}"}
         
         today = date.today()
-        start = today - timedelta(days=1) 
+        start = today - timedelta(days=2) 
 
         query_weather = text("""
             select date, rain from v_unified_weather
@@ -66,26 +66,65 @@ def final_analysis(db_conn, farm_id, target_date):
         }
 
     # STEP 2. evaluate the target_date first
-    first_check = evaluate_date(target_date, weather_list, soil_type)
-    first_risk = first_check['final_risk']
-    if first_risk == 'Low':
-        first_check['message'] = f"{target_date} is a safe day for fertiliser application."
-        first_check['recommended_date'] = target_date
-        return first_check
-
-    alt_report = []
-    # search for an alternative date 
+    full_demo_report = []
     for i in range(0, 9):
         check_date = today + timedelta(days=i)
-        if check_date == target_date: continue
             
         alt_result = evaluate_date(check_date, weather_list, soil_type)
         alt_result['date'] =  check_date.strftime("%Y-%m-%d")
-        
-        alt_report.append(alt_result)
+        full_demo_report.append(alt_result)
 
-        if alt_result['final_risk'] == 'Low' and check_date != target_date:
-            alt_result['message'] = f"{target_date} is {first_risk}. We strongly recommend {check_date} instead!"
-            alt_result['recommended_date'] = check_date
-            alt_report['full_demo_report'] = alt_report 
-            return alt_result
+    target_date_str = target_date.strftime("%Y-%m-%d")
+    first_check = next((item for item in full_demo_report if item['date'] == target_date_str), None)
+
+    if first_check['final_risk'] == 'Low':
+        result = dict(first_check)
+        result['message'] = f"{target_date_str} is a safe day for fertiliser application."
+        result['recommended_date'] = target_date_str
+        result['full_demo_report'] = full_demo_report
+        return result
+    
+    elif first_check['final_risk'] == 'Medium':
+        alt_low = next((item for item in full_demo_report if item['final_risk'] == 'Low' and item['date'] != target_date_str), None)
+
+        if alt_low:
+            result = dict(alt_low)
+            result['message'] = f"{target_date_str} is Medium. It is acceptable, but {alt_low['date']} (Low) is a safer alternative."
+            result['recommended_date'] = alt_low['date']
+            result['full_demo_report'] = full_demo_report
+            return result
+        else:
+            result = dict(first_check)
+            result['message'] = f"{target_date_str} is Medium. No safer days (Low) found in the forecast, so proceed with caution."
+            result['recommended_date'] = target_date_str 
+            result['full_demo_report'] = full_demo_report
+            return result
+    
+    # first_check['final_risk'] == 'High'
+    else:
+        alt_low = next((item for item in full_demo_report if item['final_risk'] == 'Low' and item['date'] != target_date_str), None)
+        if alt_low:
+            result = dict(alt_low)
+            result['message'] = f"{target_date_str} is High-risk! We strongly recommend waiting until {alt_low['date']} (Low)."
+            result['recommended_date'] = alt_low['date']
+            result['full_demo_report'] = full_demo_report
+            return result
+            
+        alt_medium = next((item for item in full_demo_report if item['final_risk'] == 'Medium' and item['date'] != target_date_str), None)
+        if alt_medium:
+            result = dict(alt_medium)
+            result['message'] = f"{target_date_str} is High-risk! No optimal days found, but {alt_medium['date']} (Medium) is a better option."
+            result['recommended_date'] = alt_medium['date']
+            result['full_demo_report'] = full_demo_report
+            return result
+        
+        # all High
+        result = dict(first_check)
+        result['message'] = f"{target_date_str} is High-risk, and there are NO suitable alternative dates within the forecast. DO NOT SPREAD."
+        result['recommended_date'] = None
+        result['full_demo_report'] = full_demo_report
+        return result
+
+
+
+
