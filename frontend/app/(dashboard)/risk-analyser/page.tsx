@@ -143,7 +143,7 @@ export default function RiskAnalyserPage() {
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="text-xl font-black text-slate-800">9-Day Detailed Demo Report</h3>
+              <h3 className="text-xl font-black text-slate-800">8-Day Detailed Demo Report</h3>
               <p className="text-sm text-slate-500 mt-1">Underlying logic and sliding window analysis for optimal date selection.</p>
             </div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{result.full_demo_report.length} Days Analysed</span>
