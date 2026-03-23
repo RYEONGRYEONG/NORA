@@ -6,6 +6,10 @@ export default function RiskAnalyserPage() {
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const URL = process.env.NEXT_PUBLIC_API_URL;
+  const today = new Date();
+  const maxDate = new Date();
+  maxDate.setDate(today.getDate() + 7);
+  const maxDateString = maxDate.toISOString().split('T')[0];
 
   const handleAnalyse = async (dateToUse?: string) => {
     const checkDate = dateToUse || targetDate
@@ -69,6 +73,8 @@ export default function RiskAnalyserPage() {
             type="date" 
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]}
+            max={maxDateString}
             className="p-3 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#0782c5]"
           />
           <button 
