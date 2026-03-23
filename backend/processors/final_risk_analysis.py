@@ -18,16 +18,12 @@ def final_analysis(db_conn, farm_id, target_date):
         result = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()
         soil_type = result[0]
 
-        if 'poorly' in soil_type: days = 5
-        elif 'moderately' in soil_type: days = 3
-        else: days = 2
-
-        max_allowed_date = date.today() + timedelta(days=8)
+        max_allowed_date = date.today() + timedelta(days=7)
         if target_date > max_allowed_date:
             return {"error": f"Search available up to {max_allowed_date}"}
         
         today = date.today()
-        start = today - timedelta(days=2) 
+        start = today - timedelta(days=2)
 
         query_weather = text("""
             select date, rain from v_unified_weather
@@ -67,7 +63,7 @@ def final_analysis(db_conn, farm_id, target_date):
 
     # STEP 2. evaluate the target_date first
     full_demo_report = []
-    for i in range(0, 9):
+    for i in range(0, 8):
         check_date = today + timedelta(days=i)
             
         alt_result = evaluate_date(check_date, weather_list, soil_type)
