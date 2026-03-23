@@ -3,14 +3,14 @@ def calculate_rain_risk(forecast_list, soil_type, past_rain_sum):
 
     # 1. hard high
     if past_rain_sum >= 10.0:
-        return {"risk_level": "High", "score": 100, "reason": "Past rainfall exceeds 10mm, indicating saturated soil."}
+        return {"risk_level": "High", "score": 100, "reason": f"Past 2-day rain ({past_rain_sum}mm) exceeds 10mm.", "details": {"past_rain_sum": round(past_rain_sum, 2), "forecast_rain_sum": round(forecast_rain_sum, 2)}}
     
-    if forecast_rain_sum >= 10.0 and 'poorly' in soil_type:
-        return {"risk_level": "High", "score": 100, "reason": "Heavy rainfall (>=10mm) is forecasted on poorly drained soil."}
+    if forecast_rain_sum >= 10.0:
+        return {"risk_level": "High", "score": 100, "reason": f"Heavy rainfall ({forecast_rain_sum}mm) is forecasted.", "details": {"past_rain_sum": round(past_rain_sum, 2), "forecast_rain_sum": round(forecast_rain_sum, 2)}}
     
     # 2. near high
     if past_rain_sum >= 7.0 and forecast_rain_sum >= 7.0:
-        return {"risk_level": "High", "score": 100, "reason": "High rainfall pressure: both past and forecasted rain exceed 7mm."}
+        return {"risk_level": "High", "score": 100, "reason": "High rainfall pressure: both past and forecasted rain exceed 7mm.", "details": {"past_rain_sum": round(past_rain_sum, 2), "forecast_rain_sum": round(forecast_rain_sum, 2)}}
 
     # (1) past rain score
     if past_rain_sum >= 10.0: past_score = 40
@@ -33,7 +33,6 @@ def calculate_rain_risk(forecast_list, soil_type, past_rain_sum):
 
     total_score = past_score + forecast_score + soil_score
 
-   
     # 3. Final Banding
     if total_score >= 67:
         risk_level = "High"
