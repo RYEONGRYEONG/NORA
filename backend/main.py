@@ -36,7 +36,7 @@ def get_weather_forecast(farm_id: int):
             daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
 
             hourly_query = text("""
-                                select forecast_time, precip, temp, humidity, wind_speed
+                                select forecast_time, precip, temp, humidity, wind_speed, wind_gust
                                 from forecast where farm_id = :id order by forecast_time asc
                                 """)
             hourly_rows = conn.execute(hourly_query, {"id": farm_id}).fetchall()
@@ -55,7 +55,8 @@ def get_weather_forecast(farm_id: int):
                     "rain": float(r.precip),
                     "temp": float(r.temp),
                     "humidity": float(r.humidity),
-                    "wind": float(r.wind_speed)
+                    "wind": float(r.wind_speed),
+                    "gust": float(r.wind_gust)
                 } for r in hourly_rows]
             }
         
