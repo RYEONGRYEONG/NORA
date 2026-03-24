@@ -14,6 +14,8 @@ def get_smd_status(weather_list, soil_type, target_date):
     forecast_days = [item for item in weather_list if item['date'] >= yesterday_data['date'] + timedelta(days=1)]
     final_smd = current_smd
 
+    print(f"DEBUG: current_smd: {current_smd}")
+
     for day_data in forecast_days:
         pe = calculate_pe_forecast(
             max_temp = day_data['maxtp'],
