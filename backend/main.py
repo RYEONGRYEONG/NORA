@@ -24,6 +24,44 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
+@app.get("/api/forecast")
+def get_weather_forecast(farm_id: int):
+    try:
+        with db_conn.connect() as conn:
+            daily_query = text("""
+                               select date, rain, maxtp, mintp, humidity from v_unified_weather
+                               where farm_id = : id and date >= CURDATE()
+                               order by date asc 
+                               """)
+            daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
+
+            hourly_query = text("""
+                                select forecast_time, precip, temp, humidity, wind_speed
+                                from forecast where farm_id = :id order by forecast_time asc
+                                """)
+            hourly_rows = conn.execute(hourly_query, {"id: farm_id"}).fetchall()
+
+            return{
+                "daily": [{
+                    "date": r.date.isoformat(),
+                    "rain": float(r.rain), # Decimal -> float
+                    "max": float(r.maxtp),
+                    "min": float(r.mintp),
+                    "humidity": float(r.humidity)
+                } for r in daily_rows],
+
+                "hourly": [{
+                    "time": r.forecast_time.isoformat(),
+                    "rain": float(r.precip),
+                    "temp": float(r.temp),
+                    "humidity": float(r.humidity),
+                    "wind": float(r.wind_speed)
+                } for r in hourly_rows]
+            }
+        
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.post("/api/farms/select/{farm_id}")
 def select_and_sync_farm(farm_id: int):
     try:
