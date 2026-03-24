@@ -34,6 +34,12 @@ def calculate_pe_from_obs(row): # pressure, humidity, dew_point Data X
     return max(0.0, round(pe, 2))
 
 def calculate_pe_forecast(max_temp, min_temp, wind_speed, pressure, humidity, total_rad):
+    max_temp = float(max_temp)
+    min_temp = float(min_temp)
+    wind_speed = float(wind_speed)
+    pressure = float(pressure)
+    humidity = float(humidity)
+    total_rad = float(total_rad)
 
     wind_speed_ms = max(0, wind_speed * 0.5144) # Knot -> m/s
     total_rad_mj = total_rad / 100.0  # J/cm2 -> MJ/m2
@@ -65,6 +71,10 @@ def calculate_pe_forecast(max_temp, min_temp, wind_speed, pressure, humidity, to
 
 
 def calculated_smd(yesterday_smd, pe, rain, soil_type):
+    yesterday_smd = float(yesterday_smd)
+    pe = float(pe)
+    rain = float(rain)
+
     smd_max = 110.0
 
     if soil_type == 'well':
