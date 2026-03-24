@@ -25,7 +25,7 @@ export default function DailyWeather({ data }: { data: any[] }) {
                 <span className="font-bold text-slate-800">{day.max.toFixed(1)}°</span>
                 <span className="text-slate-400">{day.min.toFixed(1)}°</span>
               </div>
-              <p className="text-xs text-slate-400 mt-2">{day.rain > 0 ? `${day.rain}mm` : 'No rain'}</p>
+              <p className="text-xs text-[#0782c5] font-semibold mt-2">{day.rain > 0 ? `${day.rain}mm` : 'No rain'}</p> 
             </div>
           );
         })}
