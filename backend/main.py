@@ -30,7 +30,7 @@ def get_weather_forecast(farm_id: int):
         with db_conn.connect() as conn:
             daily_query = text("""
                                select date, rain, maxtp, mintp, humidity from v_unified_weather
-                               where farm_id = : id and date >= CURDATE()
+                               where farm_id = :id and date >= CURDATE()
                                order by date asc 
                                """)
             daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
@@ -39,7 +39,7 @@ def get_weather_forecast(farm_id: int):
                                 select forecast_time, precip, temp, humidity, wind_speed
                                 from forecast where farm_id = :id order by forecast_time asc
                                 """)
-            hourly_rows = conn.execute(hourly_query, {"id: farm_id"}).fetchall()
+            hourly_rows = conn.execute(hourly_query, {"id": farm_id}).fetchall()
 
             return{
                 "daily": [{
