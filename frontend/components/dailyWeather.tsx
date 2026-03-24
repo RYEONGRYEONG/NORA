@@ -12,7 +12,7 @@ export default function DailyWeather({ data }: { data: any[] }) {
       <div className="flex space-x-4 overflow-x-auto pb-4 custom-scrollbar">
         {data.map((day, index) => {
           const dateObj = new Date(day.date);
-          const icon = day.rain > 0 ? '🌧️' : day.hum > 70 ? '☁️' : '☀️';
+          const icon = day.rain > 0 ? '🌧️' : day.humidity > 70 ? '☁️' : '☀️';
 
           return (
             <div key={index} className="flex-none w-36 bg-slate-50 p-5 rounded-2xl border border-slate-100 text-center">
