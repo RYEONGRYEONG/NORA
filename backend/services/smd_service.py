@@ -18,11 +18,10 @@ def get_smd_status(weather_list, soil_type, target_date):
         pe = calculate_pe_forecast(
             max_temp = day_data['maxtp'],
             min_temp = day_data['mintp'],
-            mean_temp = day_data['meantp'],
             wind_speed = day_data['wdsp'],
             pressure = day_data['cbl'],
             humidity = day_data['humidity'],
-            total_rad_mj = day_data['glorad'] / 100.0
+            total_rad = day_data['glorad']
         )
 
         _, next_smd, _ = calculated_smd(final_smd, pe, day_data['rain'], soil_type)
@@ -52,7 +51,7 @@ def obs_analysis(init_wd, init_md, init_pd, db_conn):
 
     query = text("""
              select date, maxtp, mintp, wdsp, glorad, rain
-             from obs_hist where date = '2026-03-17'
+             from obs_hist where date = '2026-03-22'
              order by date
                  """)
     

@@ -26,7 +26,7 @@ def final_analysis(db_conn, farm_id, target_date):
         start = today - timedelta(days=2)
 
         query_weather = text("""
-            select date, rain from v_unified_weather
+            select date, rain, maxtp, mintp, wdsp, cbl, humidity, glorad, smd_wd, smd_md, smd_pd from v_unified_weather
             where (farm_id = :farm_id or farm_id is null) and date >= :start
             order by date asc
         """)
@@ -41,9 +41,8 @@ def final_analysis(db_conn, farm_id, target_date):
         if "error" in rain_report: return {"risk_level": "Error", "details": rain_report}
         
         # (2) call smd ervice 
-        # smd_report = get_smd_status(w_list, s_type, eval_date)
-        # smd_risk = smd_report['risk_level']
-        smd_risk = "Low" # test 
+        smd_report = get_smd_status(w_list, s_type, eval_date)
+        smd_risk = smd_report['risk_level']
         
         # (3) call get_matrix_risk
         rain_risk = rain_report['risk_level']
@@ -54,8 +53,7 @@ def final_analysis(db_conn, farm_id, target_date):
             "smd_risk": smd_risk,
             "rain_risk": rain_risk,
             "score": rain_report['score'],
-            "smd_value": 0.0, # test
-            #smd_report['smd_value'],
+            "smd_value": smd_report['smd_value'], 
             "reason": rain_report.get('reason', "Normal rainfall levels."),
             "past_rain_sum": rain_report['details']['past_rain_sum'],
             "forecast_rain_sum": rain_report['details']['forecast_rain_sum']
