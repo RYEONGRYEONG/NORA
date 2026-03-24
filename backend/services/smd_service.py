@@ -10,14 +10,15 @@ def get_smd_status(weather_list, soil_type, target_date):
 
     base_data = None
 
-    for data in weather_list:
+    for data in reversed(weather_list):
         if data.get(smd_col) is not None:
-            base_data
-        else: break
+            base_data = data
+            break
 
     if base_data:
-        current_smd = base_data(smd_col)
+        current_smd = base_data[smd_col]
         start_date = base_data['date']
+        final_smd = current_smd
         print(f"[DEBUG] Base SMD found, Date: {start_date},Value: {current_smd}mm")
 
     forecast_days = [item for item in weather_list if item['date'] > start_date]
@@ -47,7 +48,7 @@ def get_smd_status(weather_list, soil_type, target_date):
 
     return {
         "risk_level": risk_level,
-        "smd_value": final_smd
+        "smd_value": round(final_smd, 2)
     }
 
 
