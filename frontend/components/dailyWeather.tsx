@@ -12,7 +12,23 @@ export default function DailyWeather({ data }: { data: any[] }) {
       <div className="flex space-x-4 overflow-x-auto pb-4 custom-scrollbar">
         {data.map((day, index) => {
           const dateObj = new Date(day.date);
-          const icon = day.rain > 0 ? '🌧️' : day.humidity > 70 ? '☁️' : '☀️';
+          let icon = '☀️'; // default
+
+          if (day.rain > 10.0){
+            icon = '⛈️';
+          }
+          else if (day.rain >= 7.0){
+            icon = '🌧️⚠️';
+          }
+          else if (day.rain >= 3.0){
+            icon = '🌧️';
+          }
+          else if (day.rain >= 1.0){
+            icon = '🌦️';
+          }
+          else if (day.rain > 0){
+            icon = '💧';
+          }
 
           return (
             <div key={index} className="flex-none w-36 bg-slate-50 p-5 rounded-2xl border border-slate-100 text-center">
