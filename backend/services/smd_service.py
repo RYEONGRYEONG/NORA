@@ -6,16 +6,22 @@ from database import db_conn
 from processors.smd_processor import calculate_pe_from_obs, calculated_smd, calculate_pe_forecast
 
 def get_smd_status(weather_list, soil_type, target_date):
-    yesterday_data = weather_list[0]
-
     smd_col = f"smd_{'wd' if 'well' in soil_type else 'md' if 'moderately' in soil_type else 'pd'}"
+
+    base_data = None
+
+    for data in weather_list:
+        if data.get(smd_col) is not None:
+            base_data
+        else: break
+
+    if base_data:
+        current_smd = base_data(smd_col)
+        start_date = base_data['date']
+        print(f"[DEBUG] Base SMD found, Date: {start_date},Value: {current_smd}mm")
+
+    forecast_days = [item for item in weather_list if item['date'] > start_date]
     
-    current_smd = yesterday_data.get(smd_col)
-    forecast_days = [item for item in weather_list if item['date'] >= yesterday_data['date'] + timedelta(days=1)]
-    final_smd = current_smd
-
-    print(f"DEBUG: current_smd: {current_smd}")
-
     for day_data in forecast_days:
         pe = calculate_pe_forecast(
             max_temp = day_data['maxtp'],
