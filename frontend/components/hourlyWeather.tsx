@@ -61,8 +61,7 @@ return (
       {/* [1] Date Selection */}
       <div className="flex justify-between items-end bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
         <div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Risk Analyser</h1>
-          <p className="text-sm text-slate-500 mt-1 italic">Plan your spreading: Select a date to check the safety window.</p>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Select a date to check your safe spreading window.</h1>
         </div>
         <div className="flex gap-3">
           <input 
