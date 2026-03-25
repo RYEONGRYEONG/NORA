@@ -66,8 +66,7 @@ export default function RiskAnalyserPage() {
       {/* Target Date */}
       <div className="flex justify-between items-end bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
         <div>
-          <h1 className="text-3xl font-black text-slate-800">Risk Analyser</h1>
-          <p className="text-sm text-slate-500 mt-1">When are you planning to spread fertiliser? Select a date to check the conditions!</p>
+          <h1 className="text-3xl font-black text-slate-800">When are you planning to spread fertiliser? Select a date to check the conditions!</h1>
         </div>
         <div className="flex gap-3">
           <input 
