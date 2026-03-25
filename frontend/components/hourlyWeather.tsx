@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 
-export default function HourlyDecisionPage() {
+export default function HourlyWeatherPage({ data }: { data: any[] }) {
   const [targetDate, setTargetDate] = useState('');
   const [hourlyData, setHourlyData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
