@@ -7,21 +7,21 @@ export default function HourlyWeatherPage({data}: {data: any[]}) {
 
   if (!data || data.length === 0) return null;
 
-  const getRisk = (rain: number, wind: number, gust: number) => {
+  const getRisk = (rain: number, wind: number) => {
     // (wind (m/s))
     // light rain -> avoid
-    if (rain >= 1.0 || wind >= 2.8 || gust >= 4.2) return { status: 'Avoid', color: 'bg-red-400', icon: '🔴', label: 'High Risk' };
-    if (rain > 0 || wind >= 2.0 || gust >= 2.8) return { status: 'Caution', color: 'bg-amber-300', icon: '🟡', label: 'Caution' };
+    if (rain >= 1.0 || wind >= 2.8) return { status: 'Avoid', color: 'bg-red-400', icon: '🔴', label: 'High Risk' };
+    if (rain > 0 || wind >= 2.0) return { status: 'Caution', color: 'bg-amber-300', icon: '🟡', label: 'Caution' };
     return { status: 'Good', color: 'bg-emerald-400', icon: '🟢', label: 'Optimal' };
   };
 
   // calculate optimal working window
-  const goodHours = data.filter((h: any) => getRisk(h.rain, h.wind, h.gust).status === 'Good');
+  const goodHours = data.filter((h: any) => getRisk(h.rain, h.wind).status === 'Good');
   const bestWindow = goodHours.length > 0 
     ? `${format(parseISO(goodHours[0].time), 'HH:mm')} – ${format(parseISO(goodHours[Math.min(3, goodHours.length-1)].time), 'HH:mm')}`
     : "No ideal window on this day";
 
-  const firstAvoid = data.find((h: any) => getRisk(h.rain, h.wind, h.gust).status === 'Avoid');
+  const firstAvoid = data.find((h: any) => getRisk(h.rain, h.wind).status === 'Avoid');
   
 return (
     <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 animate-in slide-in-from-bottom-4 duration-500 mt-8 font-sans">
@@ -39,7 +39,7 @@ return (
          <h3 className="text-xs font-black text-slate-300 mb-5 uppercase tracking-tighter text-center italic font-sans">Hourly Safety Strip (Click for details)</h3>
          <div className="flex overflow-x-auto pb-6 space-x-1.5 custom-scrollbar">
             {data.map((hour: any, idx: number) => {
-              const risk = getRisk(hour.rain, hour.wind, hour.gust);
+              const risk = getRisk(hour.rain, hour.wind);
               return (
                 <button 
                   key={idx} 
