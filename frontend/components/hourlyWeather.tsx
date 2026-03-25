@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 
-export default function HourlyWeatherPage({ data }: { data: any[] }) {
+export default function HourlyWeatherPage() {
   const [targetDate, setTargetDate] = useState('');
   const [hourlyData, setHourlyData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,9 +59,11 @@ export default function HourlyWeatherPage({ data }: { data: any[] }) {
 return (
     <div className="space-y-8 animate-in fade-in duration-500 font-sans">
       {/* [1] Date Selection */}
-      <div className="flex justify-between items-end bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+      <div className="flex flex-col gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Select a date to check your safe spreading window.</h1>
+          <h1 className="text-4xl font-black text-black tracking-tight leading-none">Plan Your Spreading</h1>
+          <p className="text-xl font-bold text-slate-700 leading-snug italic underline decoration-emerald-400 decoration-4 underline-offset-8">
+            Select a date to check the safety window.</p>
         </div>
         <div className="flex gap-3">
           <input 
