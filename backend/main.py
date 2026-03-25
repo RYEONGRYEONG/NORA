@@ -24,21 +24,15 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
-@app.get("/api/hourly")
-def get_weather_forecast(farm_id: int, target_date: str):
+@app.get("/api/forecast")
+def get_daily_forecast(farm_id: int): 
     try:
         with db_conn.connect() as conn:
             daily_query = text("""
                                select date, rain, maxtp, mintp, humidity from v_unified_weather
-                               where farm_id = :id and date = :target_date
+                               where farm_id = :id and date >= CURDATE()
                                """)
-            daily_rows = conn.execute(daily_query, {"id": farm_id, "target_date": target_date}).fetchall()
-
-            hourly_query = text("""
-                                select forecast_time, precip, temp, humidity, wind_speed, wind_gust
-                                from forecast where farm_id = :id and date(forecast_time) = :target_date order by forecast_time asc 
-                                """)
-            hourly_rows = conn.execute(hourly_query, {"id": farm_id, "target_date": target_date}).fetchall()
+            daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
 
             return{
                 "daily": [{
@@ -47,8 +41,23 @@ def get_weather_forecast(farm_id: int, target_date: str):
                     "max": float(r.maxtp),
                     "min": float(r.mintp),
                     "humidity": float(r.humidity)
-                } for r in daily_rows],
+                } for r in daily_rows]
+            }
+        
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
+@app.get("/api/hourly")
+def get_hourly_forecast(farm_id: int, target_date: str):
+    try:
+        with db_conn.connect() as conn:
+            hourly_query = text("""
+                                select forecast_time, precip, temp, humidity, wind_speed, wind_gust
+                                from forecast where farm_id = :id and date(forecast_time) = :target_date order by forecast_time asc 
+                                """)
+            hourly_rows = conn.execute(hourly_query, {"id": farm_id, "target_date": target_date}).fetchall()
+            
+            return{
                 "hourly": [{
                     "time": r.forecast_time.isoformat(),
                     "rain": float(r.precip),
