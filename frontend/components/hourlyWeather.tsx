@@ -30,7 +30,7 @@ export default function HourlyWeatherPage({ data }: { data: any[] }) {
     setLoading(true)
 
     try {
-      const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${targetDate}`);
+      const response = await fetch(`${URL}/api/hourly?farm_id=${farmId}&target_date=${targetDate}`);
       const data = await response.json();
 
       if (response.ok) {
