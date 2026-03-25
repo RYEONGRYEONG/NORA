@@ -24,22 +24,21 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
-@app.get("/api/forecast")
-def get_weather_forecast(farm_id: int):
+@app.get("/api/hourly")
+def get_weather_forecast(farm_id: int, target_date: str):
     try:
         with db_conn.connect() as conn:
             daily_query = text("""
                                select date, rain, maxtp, mintp, humidity from v_unified_weather
-                               where farm_id = :id and date >= CURDATE()
-                               order by date asc 
+                               where farm_id = :id and date = :target_date
                                """)
-            daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
+            daily_rows = conn.execute(daily_query, {"id": farm_id, "target_date": target_date}).fetchall()
 
             hourly_query = text("""
                                 select forecast_time, precip, temp, humidity, wind_speed, wind_gust
-                                from forecast where farm_id = :id order by forecast_time asc
+                                from forecast where farm_id = :id and date(forecast_time) = :target_date order by forecast_time asc 
                                 """)
-            hourly_rows = conn.execute(hourly_query, {"id": farm_id}).fetchall()
+            hourly_rows = conn.execute(hourly_query, {"id": farm_id, "target_date": target_date}).fetchall()
 
             return{
                 "daily": [{
