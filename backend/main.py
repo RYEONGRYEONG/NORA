@@ -53,8 +53,8 @@ def get_historical_data(farm_id: int):
 
             avg_query = text("""
                 select avg(smd_col) as avg_smd, avg(rain) as avg_rain
-                from v_unified_weather where farm_id = :id 
-                and month(date) = month(date_sub(curdate(), interval 1 day))
+                from obs_hist
+                where month(date) = month(date_sub(curdate(), interval 1 day))
                 and date < date_sub(curdate(), interval 1 year) 
             """)
             avg_row = conn.execute(avg_query, {"id": farm_id}).fetchone()
