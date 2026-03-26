@@ -5,11 +5,15 @@ import {
 import { format, parseISO } from 'date-fns';
 
 export default function HistoricalChart({ trend, average }: { trend: any[], average: any }) {
-  const formattedData = trend.map(item => ({
+  const formattedData = (trend || []).map(item => ({
     ...item,
     displayDate: format(parseISO(item.date), 'MM/dd'),
     avgSmd: average?.smd || 0
   }));
+
+  if (!trend || trend.length === 0) {
+    return <div className="h-[400px] flex items-center justify-center bg-white rounded-[2rem]">No historical data available or no farm selected.</div>;
+  }
 
   return (
     <div className="h-[400px] w-full bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">

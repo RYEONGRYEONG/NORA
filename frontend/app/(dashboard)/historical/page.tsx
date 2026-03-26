@@ -75,7 +75,7 @@ export default function HistoricalPage() {
       </div>
 
       {/* chart */}
-      <HistoricalChart trend={data.trend} average={data.average} />
+      <HistoricalChart trend={data?.trend || []} average={data?.average || {smd: 0, trend: 0 }}/>
 
       {/* actionable Insight */}
       <div className={`p-8 rounded-[2rem] border-l-[12px] shadow-sm ${isWetterThanNormal ? 'bg-amber-50 border-amber-400' : 'bg-emerald-50 border-emerald-400'}`}>
