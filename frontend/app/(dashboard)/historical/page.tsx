@@ -33,7 +33,7 @@ export default function HistoricalPage() {
   }, [URL]);
 
   if (loading) return <div className="p-8 text-center text-slate-500 font-bold">Loading historical context...</div>;
-  if (!data || data.trend.length === 0) return <div className="p-8 text-center text-red-500">No historical data found.</div>;
+  if (!data || !data.trend || data.trend.length === 0) return <div className="p-8 text-center text-red-500">No historical data found.</div>;
 
   const currentSMD = data.trend[data.trend.length - 1].smd;
   const avgSMD = data.average.smd;
