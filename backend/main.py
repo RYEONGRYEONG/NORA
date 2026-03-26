@@ -24,13 +24,58 @@ app.add_middleware(
     allow_headers=["*"] # auth token
 )
 
+@app.get("/api/historical")
+def get_historical_data(farm_id: int):
+    try:
+        with db_conn.connect() as conn:
+            farm_query = text("select soil_condition from farms where id = :id")
+            farm_info = conn.execute(farm_query, {"id": farm_id}).fetchone()
+            
+            if not farm_info:
+                return {"status": "error", "message": "Farm not found"}
+            
+            soil_type = farm_info.soil_condition
+            smd_col = f"smd_{'wd' if 'well' in soil_type else 'md' if 'moderately' in soil_type else 'pd'}"
+
+            trend_query = text("""
+                select date, smd_col, rain 
+                from v_unified_weather 
+                where farm_id = :id and date between date_sub(curdate(), interval 14 day) and date_sub(curdate(), interval 1 day)
+                order by date asc
+            """)
+            trend_rows = conn.execute(trend_query, {"id": farm_id}).fetchall()
+            
+            trend_data = [{
+                "date": r.date.isoformat(),
+                "smd": float(r.smd),
+                "rain": float(r.rain)
+            } for r in trend_rows]
+
+            avg_query = text("""
+                select avg(smd_col) as avg_smd, avg(rain) as avg_rain
+                from v_unified_weather where farm_id = :id 
+                and month(date) = month(date_sub(curdate(), interval 1 day))
+                and date < date_sub(curdate(), interval 1 year) 
+            """)
+            avg_row = conn.execute(avg_query, {"id": farm_id}).fetchone()
+
+            return {
+                "trend": trend_data,
+                "average": {
+                    "smd": float(avg_row.avg_smd),
+                    "rain": float(avg_row.avg_rain)
+                }
+            }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/api/forecast")
 def get_daily_forecast(farm_id: int): 
     try:
         with db_conn.connect() as conn:
             daily_query = text("""
                                select date, rain, maxtp, mintp, humidity from v_unified_weather
-                               where farm_id = :id and date >= CURDATE()
+                               where farm_id = :id and date >= curdate()
                                """)
             daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
 
