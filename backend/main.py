@@ -75,7 +75,7 @@ def get_daily_forecast(farm_id: int):
         with db_conn.connect() as conn:
             daily_query = text("""
                                select date, rain, maxtp, mintp, humidity from v_unified_weather
-                               where farm_id = :id and between curdate() and date_add(curdate(), interal 7 day)
+                               where farm_id = :id and date between curdate() and date_add(curdate(), interval 7 day)
                                """)
             daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
 
