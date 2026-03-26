@@ -39,8 +39,8 @@ def get_historical_data(farm_id: int):
 
             trend_query = text(f"""
                 select date, {smd_col} as smd, rain 
-                from v_unified_weather 
-                where farm_id = :id and date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 2 day)
+                from obs_hist
+                where date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 2 day)
                 order by date asc
             """)
             trend_rows = conn.execute(trend_query, {"id": farm_id}).fetchall()
