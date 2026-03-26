@@ -40,7 +40,7 @@ def get_historical_data(farm_id: int):
             trend_query = text("""
                 select date, smd_col, rain 
                 from v_unified_weather 
-                where farm_id = :id and date between date_sub(curdate(), interval 14 day) and date_sub(curdate(), interval 1 day)
+                where farm_id = :id and date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 2 day)
                 order by date asc
             """)
             trend_rows = conn.execute(trend_query, {"id": farm_id}).fetchall()
@@ -54,7 +54,7 @@ def get_historical_data(farm_id: int):
             avg_query = text("""
                 select avg(smd_col) as avg_smd, avg(rain) as avg_rain
                 from obs_hist
-                where month(date) = month(date_sub(curdate(), interval 1 day))
+                where month(date) = month(date_sub(curdate(), interval 2 day))
                 and date < date_sub(curdate(), interval 1 year) 
             """)
             avg_row = conn.execute(avg_query, {"id": farm_id}).fetchone()
@@ -75,7 +75,7 @@ def get_daily_forecast(farm_id: int):
         with db_conn.connect() as conn:
             daily_query = text("""
                                select date, rain, maxtp, mintp, humidity from v_unified_weather
-                               where farm_id = :id and date >= curdate()
+                               where farm_id = :id and between curdate() and date_add(curdate(), interal 7 day))
                                """)
             daily_rows = conn.execute(daily_query, {"id": farm_id}).fetchall()
 
