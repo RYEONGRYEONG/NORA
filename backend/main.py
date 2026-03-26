@@ -34,11 +34,11 @@ def get_historical_data(farm_id: int):
             if not farm_info:
                 return {"status": "error", "message": "Farm not found"}
             
-            soil_type = farm_info.soil_condition
+            soil_type = farm_info[0]
             smd_col = f"smd_{'wd' if 'well' in soil_type else 'md' if 'moderately' in soil_type else 'pd'}"
 
-            trend_query = text("""
-                select date, smd_col, rain 
+            trend_query = text(f"""
+                select date, {smd_col} as smd, rain 
                 from v_unified_weather 
                 where farm_id = :id and date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 2 day)
                 order by date asc
@@ -52,7 +52,7 @@ def get_historical_data(farm_id: int):
             } for r in trend_rows]
 
             avg_query = text("""
-                select avg(smd_col) as avg_smd, avg(rain) as avg_rain
+                select avg({smd_col}) as avg_smd, avg(rain) as avg_rain
                 from obs_hist
                 where month(date) = month(date_sub(curdate(), interval 2 day))
                 and date < date_sub(curdate(), interval 1 year) 
