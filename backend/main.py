@@ -40,7 +40,7 @@ def get_historical_data(farm_id: int):
             trend_query = text(f"""
                 select date, {smd_col} as smd, rain 
                 from obs_hist
-                where date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 2 day)
+                where date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 1 day)
                 order by date asc
             """)
             trend_rows = conn.execute(trend_query).fetchall()
@@ -54,7 +54,7 @@ def get_historical_data(farm_id: int):
             avg_query = text(f"""
                 select avg({smd_col}) as avg_smd, avg(rain) as avg_rain
                 from obs_hist
-                where month(date) = month(date_sub(curdate(), interval 2 day))
+                where month(date) = month(date_sub(curdate(), interval 1 day))
                 and date < date_sub(curdate(), interval 1 year) 
             """)
             avg_row = conn.execute(avg_query).fetchone()

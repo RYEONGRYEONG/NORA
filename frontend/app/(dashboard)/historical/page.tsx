@@ -59,7 +59,7 @@ export default function HistoricalPage() {
             <span className="text-5xl font-black text-slate-800">{currentSMD.toFixed(1)} <span className="text-2xl text-slate-400">mm</span></span>
           </div>
           <p className="text-emerald-600 font-bold mt-4 bg-emerald-50 w-fit px-4 py-2 rounded-lg">
-            Soil Moisture Deficit (Today)
+            Soil Moisture Deficit (Yesterday)
           </p>
         </div>
 
