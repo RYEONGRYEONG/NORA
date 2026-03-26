@@ -51,7 +51,7 @@ def get_historical_data(farm_id: int):
                 "rain": float(r.rain)
             } for r in trend_rows]
 
-            avg_query = text("""
+            avg_query = text(f"""
                 select avg({smd_col}) as avg_smd, avg(rain) as avg_rain
                 from obs_hist
                 where month(date) = month(date_sub(curdate(), interval 2 day))
