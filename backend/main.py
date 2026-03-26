@@ -43,7 +43,7 @@ def get_historical_data(farm_id: int):
                 where date between date_sub(curdate(), interval 15 day) and date_sub(curdate(), interval 2 day)
                 order by date asc
             """)
-            trend_rows = conn.execute(trend_query, {"id": farm_id}).fetchall()
+            trend_rows = conn.execute(trend_query).fetchall()
             
             trend_data = [{
                 "date": r.date.isoformat(),
@@ -57,7 +57,7 @@ def get_historical_data(farm_id: int):
                 where month(date) = month(date_sub(curdate(), interval 2 day))
                 and date < date_sub(curdate(), interval 1 year) 
             """)
-            avg_row = conn.execute(avg_query, {"id": farm_id}).fetchone()
+            avg_row = conn.execute(avg_query).fetchone()
 
             return {
                 "trend": trend_data,
