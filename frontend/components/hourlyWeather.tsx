@@ -10,8 +10,8 @@ export default function HourlyWeatherPage({data}: {data: any[]}) {
   const getRisk = (rain: number, wind: number) => {
     // (wind (m/s))
     // light rain -> avoid
-    if (rain >= 1.0 || wind >= 2.8) return { status: 'Avoid', color: 'bg-red-400', icon: '🔴', label: 'High Risk' };
-    if (rain > 0 || wind >= 2.0) return { status: 'Caution', color: 'bg-amber-300', icon: '🟡', label: 'Caution' };
+    if (rain >= 1.0 || wind >= 5) return { status: 'Avoid', color: 'bg-red-400', icon: '🔴', label: 'High Risk' };
+    if (rain > 0 || wind >= 2.8) return { status: 'Caution', color: 'bg-amber-300', icon: '🟡', label: 'Caution' };
     return { status: 'Good', color: 'bg-emerald-400', icon: '🟢', label: 'Optimal' };
   };
 

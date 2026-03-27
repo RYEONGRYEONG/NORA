@@ -7,7 +7,7 @@ export default function DailyWeather({ data }: { data: any[] }) {
 
   return (
     <div className="w-full bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8">
-      <h2 className="text-xl font-black text-slate-800 mb-5">10-Day Summary</h2>
+      <h2 className="text-xl font-black text-slate-800 mb-5">8-Day Summary</h2>
       
       <div className="flex space-x-4 overflow-x-auto pb-4 custom-scrollbar">
         {data.map((day, index) => {

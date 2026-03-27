@@ -73,7 +73,7 @@ return (
       {/* Header */}
       <div>
         <h1 className="text-3xl font-black text-slate-800">Weather Forecast & Risk Analyser</h1>
-        <p className="text-sm text-slate-500 mt-1 italic font-bold">10-day summary and professional risk assessment</p>
+        <p className="text-sm text-slate-500 mt-1 italic font-bold">8-day summary and hourly risk assessment</p>
       </div>
       
       {loading ? (
@@ -90,7 +90,7 @@ return (
             <div className="flex flex-col gap-3">
               <h2 className="text-4xl font-black text-slate-900 tracking-tighter">Risk Analyser</h2>
               <p className="text-xl font-bold text-slate-700">
-                Evaluate <span className="text-rose-500 underline decoration-4 underline-offset-8">weather hazards</span> to find the safest day to spread.
+                Evaluate weather hazards to find <span className="text-rose-500 underline decoration-4 underline-offset-8"> the best window </span> to spread.
               </p>
             </div>
             
