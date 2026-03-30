@@ -60,7 +60,7 @@ def obs_analysis(init_wd, init_md, init_pd, db_conn):
 
     query = text("""
              select date, maxtp, mintp, wdsp, glorad, rain
-             from obs_hist where date = '2026-03-22'
+             from obs_hist where date = '2026-03-29'
              order by date
                  """)
     
