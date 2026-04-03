@@ -1,7 +1,7 @@
 from services.smd_service import obs_analysis, save_results
 from database import db_conn 
 
-df = obs_analysis( 25.39, 25.39, 22.15, db_conn) # 01/04
+df = obs_analysis(26.86, 26.86, 23.91, db_conn) # 02/04
 
 if df is not None:
     print(df.tail()) 
