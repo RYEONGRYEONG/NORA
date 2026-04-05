@@ -6,10 +6,15 @@ import schema
 from database import db_conn
 from sign import sign_up, sign_in
 from sqlalchemy import text
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+from io import StringIO
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from fastapi import HTTPException
 from database import db_url, db_conn
+from services.smd_service import obs_analysis, save_results
 from services.forecast_service import update_farm_forecast
 from processors.final_risk_analysis import final_analysis
 
@@ -23,6 +28,116 @@ app.add_middleware(
     allow_methods=["*"], # get, post, delete
     allow_headers=["*"] # auth token
 )
+
+def fetch_yesterday_weather(target_date, db_conn):
+    api_date = target_date.strftime('%d/%m/%Y')
+    db_date = target_date.strftime('%Y-%m-%d')
+
+    url = "https://www.met.ie/climate/available-data/daily-data"
+    
+    session = requests.Session()
+    r = session.get(url)
+    r.raise_for_status()
+    
+    soup = BeautifulSoup(r.text, "html.parser")
+    token = soup.find("meta", {"name": "token"})["content"]
+    
+    payload = {
+    "stationname": "Oak Park",
+    "reportdate": api_date,
+    "_token": token,
+    }
+    
+    headers = {
+    "Referer": url,
+    "Origin": "https://www.met.ie",
+    "User-Agent": "Mozilla/5.0",
+    }
+
+    resp = session.post(url, data=payload, headers=headers)
+    resp.raise_for_status()
+
+    tables = pd.read_html(StringIO(resp.text))
+    
+    if len(tables) > 0:
+        df_raw = tables[0]
+        raw_rain = df_raw['Rainfall  (mm)'].iloc[0]
+        clean_rain = 0.0 if str(raw_rain).strip().lower() == 'tr' else raw_rain
+        raw_gmin = None if str(raw_rain).strip().lower() == 'n/a' else raw_rain
+    
+        march_table = pd.DataFrame({
+            'location': ['Oak Park'],
+            'date': [pd.to_datetime(df_raw['Date'].iloc[0], dayfirst=True)],
+            'rain': [float(clean_rain)],
+            'maxtp': [float(df_raw['Max Temp  (°C)'].iloc[0])],
+            'mintp': [float(df_raw['Min Temp  (°C)'].iloc[0])],
+            'gmin': [float(df_raw['Grass Min Temp  (°C)'].iloc[0])],
+            'wdsp': [float(df_raw['Mean Wind Speed  (knots)'].iloc[0])],
+            'hg': [float(df_raw['Max Gust  (>= 34 knots)'].iloc[0])]
+        })
+
+        try:
+            march_table.to_sql('obs_hist', con=db_conn, if_exists='append', index=False)
+            print("succeed")
+        except Exception as e:
+            print(f"error: {e}")
+
+    csv_url = "https://www.met.ie/latest-reports/observations/yesterday/download" 
+
+    df = pd.read_csv(csv_url)
+    oak_park_yesterday = df[df['Station'] == 'Oak Park']
+
+    soil = oak_park_yesterday['Soil (ºC)'].iloc[0]
+    soil = None if str(soil).strip().lower() == 'nan' else soil
+    global_rad = oak_park_yesterday['Global (J/cm^2)'].iloc[0]
+
+    with db_conn.connect() as conn:
+        query = text("""
+            update obs_hist 
+            set soil = :soil_val, glorad = :grad
+            where date = :target_date
+        """)
+    
+        conn.execute(query, {
+            "soil_val": soil,
+            "grad": global_rad,
+            "target_date": db_date,
+        })
+        conn.commit() 
+
+def get_previous_smd(target_date, db_conn):
+    day_before = (target_date - timedelta(days=1)).strftime('%Y-%m-%d')
+
+    query = text("""
+                 select smd_wd, smd_md, smd_pd from obs_hist where date = :day_before limit 1
+                 """)
+    
+    with db_conn.connect() as conn:
+        result = conn.execute(query, {"day_before": day_before}).fetchone()
+
+    if result:
+        return result[0], result[1], result[2]
+    else:
+        print(f"{day_before} data found")
+        raise ValueError(f"DB error: no SMD data found for {day_before}")
+
+def main():
+    yesterday = datetime.now() - timedelta(days=1)
+    target_date_str = yesterday.strftime('%Y-%m-%d')
+
+    fetch_yesterday_weather(yesterday, db_conn)
+    
+    init_wd, init_md, init_pd = get_previous_smd(yesterday, db_conn)
+    df_smd = obs_analysis(init_wd, init_md, init_pd, db_conn, target_date_str)
+
+    if df_smd is not None and not df_smd.empty:
+        save_results(df_smd, db_conn)
+        print("Automation Completed")
+    else:
+        print("Automation Failed")
+    
+if __name__ == "__main__":
+    main()
 
 @app.get("/api/historical")
 def get_historical_data(farm_id: int):

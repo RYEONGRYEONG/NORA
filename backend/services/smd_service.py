@@ -52,7 +52,7 @@ def get_smd_status(weather_list, soil_type, target_date):
     }
 
 
-def obs_analysis(init_wd, init_md, init_pd, db_conn):
+def obs_analysis(init_wd, init_md, init_pd, db_conn, target_date):
 
     current_smd_wd = init_wd # well draiend
     current_smd_md = init_md # moderately drained
@@ -60,13 +60,13 @@ def obs_analysis(init_wd, init_md, init_pd, db_conn):
 
     query = text("""
              select date, maxtp, mintp, wdsp, glorad, rain
-             from obs_hist where date = '2026-04-04'
+             from obs_hist where date = :target_date
              order by date
                  """)
     
     try:
         with db_conn.connect() as conn:
-            obs_df = pd.read_sql(query, conn)
+            obs_df = pd.read_sql(query, conn, params={"target_date": target_date})
         
         if obs_df.empty:
             print("No Data Found")
