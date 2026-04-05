@@ -5,6 +5,7 @@ on:
  # min / hour / day / month / day of week
  # target execution time: 09:30 Ireland Local Time
  - cron: '30 8 * * *' # UTC
+ workflow_dispatch: # allows manual triggering of the workflow
  
 jobs:
  build:
