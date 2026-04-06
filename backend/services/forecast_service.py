@@ -1,8 +1,9 @@
 import pandas as pd
 import xmltodict
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import text
+from alert_service import alert_if_heavy_rain
 
 def update_farm_forecast(farm_id, lat, lon, conn):
     # Met Éireann API
@@ -67,9 +68,41 @@ def update_farm_forecast(farm_id, lat, lon, conn):
                      """)
         
         conn.execute(query, db_data)
-
+        
         print(f"{farm_id} forecast updated successfully")
+    
+        user_query = text("select farm_name, user_email from farms where id = :farm_id")
+        farm_info = conn.execute(user_query, {"farm_id": farm_id}).fetchone()
+
+        if not farm_info or not farm_info[1]:
+            print(f"Skip Alert: No email found for {farm_id}")
+            return
+    
+        farm_name = farm_info[0]
+        user_email = farm_info[1]
+
+        heavy_rain_threshold = 10.0
+        alert = False
+
+        now = datetime.now()
+        time_limit = now + timedelta(hours=48)
+
+        for val in db_data:
+            forecast_time = datetime.strptime(val['time'], '%Y-%m-%d %H:%M:%S')
+
+            print(f"{farm_name} {val['time']} Precip: {val.get('precip')}") # Github action
+
+            if now <= forecast_time <= time_limit:
+                if val.get('precip') and float(val['precip']) >= heavy_rain_threshold:
+                    alert_if_heavy_rain(user_email, farm_name, val['time'], val['precip'])
+                    alert = True
+                    break
+
+        if not alert:
+            print(f"No Alert Sent: No Heavy rain detected for {farm_name} within 48h")
+
     except Exception as e:
         conn.rollback()
         print(f"error: {e}")
         raise e
+        
