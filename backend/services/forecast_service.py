@@ -57,7 +57,14 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             "rad": val.get('global_rad'),
             "sym": val.get('symbol_id')
         })
-      
+
+    demo = datetime.now()
+    for val in db_data:
+        demo_time = datetime.strptime(val['time'], '%Y-%m-%d %H:%M:%S')
+        if demo_time > demo:
+            val['precip'] = 15.0
+            break
+            
     try:
         query = text("""
                      insert into forecast (farm_id, forecast_time, temp, precip, humidity, wind_speed, wind_gust, wind_dir, dew_point, pressure, global_rad, symbol_id)
