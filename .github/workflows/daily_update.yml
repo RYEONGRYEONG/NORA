@@ -26,8 +26,14 @@ jobs:
      pip install pymysql cryptography
      pip install -r backend/requirements.txt
 
-  - name: Run Automation Script
+  - name: Run Observation & SMD Calculation
     env: 
       DATABASE_URL: ${{secrets.DATABASE_URL}}
-    run: python backend/main.py
-  
+    run: python backend/main.py obs
+
+  - name: Run Forecast and Alert Check
+    env:
+      DATABAE_URL: ${{secrets.DATABASE_URL}}
+      EMAIL: ${{secrets.EMAIL}}
+      EMAIL_PW: ${{secrets.EMAIL_PW}}
+    run: python backend/main.py forecast
