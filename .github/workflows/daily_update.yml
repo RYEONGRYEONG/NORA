@@ -1,4 +1,4 @@
-name: Update Observed Yesterday's Weather and Calculate SMD Value
+name: Update Weather, Calculate SMD, and Forecast Alerts 
 
 on:
  schedule:
@@ -6,6 +6,16 @@ on:
  # target execution time: 09:30 Ireland Local Time
  - cron: '30 8 * * *' # UTC
  workflow_dispatch: # allows manual triggering of the workflow
+  inputs:
+   run_target:
+    description: demo
+    required: true
+    default: 'both'
+    type: choice
+    options:
+     - both
+     - forecast_only
+     - obs_only
  
 jobs:
  build:
@@ -27,13 +37,15 @@ jobs:
      pip install -r backend/requirements.txt
 
   - name: Run Observation & SMD Calculation
+    if: ${{ github.event_name == 'schedule' || github.event.inputs.run_target == 'both' || github.event.inputs.run_target == 'obs_only'}}
     env: 
       DATABASE_URL: ${{secrets.DATABASE_URL}}
     run: python backend/main.py obs
 
   - name: Run Forecast and Alert Check
+    if: ${{ github.event_name == 'schedule' || github.event.inputs.run_target == 'both' || github.event.inputs.run_target == 'forecast_only'}}
     env:
-      DATABAE_URL: ${{secrets.DATABASE_URL}}
+      DATABASE_URL: ${{secrets.DATABASE_URL}}
       EMAIL: ${{secrets.EMAIL}}
       EMAIL_PW: ${{secrets.EMAIL_PW}}
     run: python backend/main.py forecast
