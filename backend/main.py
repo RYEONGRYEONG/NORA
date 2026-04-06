@@ -1,5 +1,6 @@
 # pip install fastapi uvicorn mysql-connector-python
 
+import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import schema
@@ -62,16 +63,17 @@ def fetch_yesterday_weather(target_date, db_conn):
     if len(tables) > 0:
         df_raw = tables[0]
         raw_rain = df_raw['Rainfall  (mm)'].iloc[0]
-        clean_rain = 0.0 if str(raw_rain).strip().lower() == 'tr' else raw_rain
-        raw_gmin = None if str(raw_rain).strip().lower() == 'n/a' else raw_rain
+        raw_gmin = df_raw['Grass Min Temp  (°C)'].iloc[0]
+        clean_rain = 0.0 if str(raw_rain).strip().lower() == 'tr' else float(raw_rain)
+        clean_gmin = None if str(raw_gmin).strip().lower() == 'n/a' else float(raw_gmin)
     
         march_table = pd.DataFrame({
             'location': ['Oak Park'],
             'date': [pd.to_datetime(df_raw['Date'].iloc[0], dayfirst=True)],
-            'rain': [float(clean_rain)],
+            'rain': [clean_rain],
             'maxtp': [float(df_raw['Max Temp  (°C)'].iloc[0])],
             'mintp': [float(df_raw['Min Temp  (°C)'].iloc[0])],
-            'gmin': [float(df_raw['Grass Min Temp  (°C)'].iloc[0])],
+            'gmin': [clean_gmin],
             'wdsp': [float(df_raw['Mean Wind Speed  (knots)'].iloc[0])],
             'hg': [float(df_raw['Max Gust  (>= 34 knots)'].iloc[0])]
         })
@@ -118,10 +120,10 @@ def get_previous_smd(target_date, db_conn):
     if result:
         return result[0], result[1], result[2]
     else:
-        print(f"{day_before} data found")
+        print(f"{day_before} data not found")
         raise ValueError(f"DB error: no SMD data found for {day_before}")
 
-def main():
+def run_daily_obs():
     yesterday = datetime.now() - timedelta(days=1)
     target_date_str = yesterday.strftime('%Y-%m-%d')
 
@@ -135,7 +137,42 @@ def main():
         print("Automation Completed")
     else:
         print("Automation Failed")
+
+def run_forecast():
+    with db_conn.connect() as conn:
+        try:
+            farm_query = text("select id, latitude, longitude from farms")
+            farms = conn.execute(farm_query).fetchall()
+
+            for farm in farms:
+                farm_id = farm[0]
+                lat = farm[1]
+                lon = farm[2]
+
+                update_farm_forecast(farm_id, lat, lon, conn)
+
+            conn.commit()
+            print("All farm forecasts updated successfully")
+
+        except Exception as e:
+            print(f"Error in main: {e}")
+            conn.rollback() 
+
+def main():
+    if len(sys.argv) > 1:
+        task = sys.argv[1]
+
+        if task == "obs":
+            run_daily_obs()
+        elif task == "forecast":
+            run_forecast()
+        else:
+            print(f"Error: Unkown task {task}")
     
+    else:
+        print("Error: No task specified")
+
+
 if __name__ == "__main__":
     main()
 
