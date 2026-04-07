@@ -3,7 +3,7 @@ import xmltodict
 import requests
 from datetime import datetime, timedelta
 from sqlalchemy import text
-from alert_service import alert_if_heavy_rain
+from services.alert_service import alert_if_heavy_rain
 
 def update_farm_forecast(farm_id, lat, lon, conn):
     # Met Éireann API
