@@ -58,12 +58,13 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             "sym": val.get('symbol_id')
         })
 
-    demo = datetime.now()
-    for val in db_data:
-        demo_time = datetime.strptime(val['time'], '%Y-%m-%d %H:%M:%S')
-        if demo_time > demo:
-            val['precip'] = 15.0
-            break
+# Alert Demo Code
+    # demo = datetime.now()
+    # for val in db_data:
+    #     demo_time = datetime.strptime(val['time'], '%Y-%m-%d %H:%M:%S')
+    #     if demo_time > demo:
+    #         val['precip'] = 15.0
+    #         break
             
     try:
         query = text("""
