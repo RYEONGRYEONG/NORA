@@ -1,5 +1,6 @@
 # pip install fastapi uvicorn mysql-connector-python
 
+import os
 import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -140,6 +141,7 @@ def run_daily_obs():
         print("Automation Failed")
 
 def run_forecast():
+    current_env = os.getenv("RUN_ENV", "local")
     with db_conn.connect() as conn:
         try:
             farm_query = text("select id, latitude, longitude from farms")
@@ -150,7 +152,7 @@ def run_forecast():
                 lat = farm[1]
                 lon = farm[2]
 
-                update_farm_forecast(farm_id, lat, lon, conn)
+                update_farm_forecast(farm_id, lat, lon, conn, run_env=current_env)
 
             conn.commit()
             print("All farm forecasts updated successfully")
