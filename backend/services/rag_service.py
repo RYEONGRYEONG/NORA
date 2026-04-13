@@ -7,7 +7,7 @@ sys.modules['pwd'] = types.ModuleType('pwd')
 from dotenv import load_dotenv 
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_community.document_loaders.web_base import WebBaseLoader
-from langchain_text_splitters import CharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
 
@@ -35,13 +35,14 @@ def ingest_knowledge(source_path, is_url=True):
     loader = WebBaseLoader(source_path) if is_url else PyPDFLoader(source_path)
     docs = loader.load()
 
-    text_splitter = CharacterTextSplitter(chunk_size=600, chunk_overlap=100)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=100, separators=["\n\n", "\n", ".", ","])
     chunks = text_splitter.split_documents(docs)
 
     db = Chroma.from_documents(documents=chunks, embedding=EMBEDDING, persist_directory=PERSIST_DIR)
-    print(f"Ingestion complete. ({len(chunks)} chunks saved)")
+    print(f"Ingestion completed. ({len(chunks)} chunks saved)")
 
-def generate_nora_reasoning(target_date, smd_value, rain_forecast, final_score):
+# target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
+def generate_nora_reasoning(target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type):
     if not os.path.exists(PERSIST_DIR):
         return "No trained data found."
 
@@ -54,39 +55,51 @@ def generate_nora_reasoning(target_date, smd_value, rain_forecast, final_score):
     "You are an AI assistant for the NORA (Nitrate and Optimised Rainfall Analysis) system, helping Irish farmers.\n"
     "Explain to the farmer WHY the system gave the '{final_score}' rating. \n"
     "Search your knowledge base (Teagasc official agricultural guidelines) using the retrieved context below.\n"
-    "Keep the explanation under 3 sentences, professional, easy to understand.\n\n"
-    "Context: {context}"
+    "Keep the explanation under 3 sentences, professional, easy for farmers to understand.\n\n"
+    "Context: {context}" # knowledge base
     )
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
-        ("human", "Target Date: {target_date}, SMD: {smd_value}, Expected Rain: {rain_forecast} mm, Recommendation: {final_score}")
+        ("human", "Target Date: {target_date}, Final Risk: {final_score}, SMD: {smd_value}, Expected Rain (next 48h): {forecast_rain_sum} mm, Past 2 days Rain: {past_rain_sum} mm, Soil Drainage: {soil_type}")
     ])
 
     document_chain = create_stuff_documents_chain(llm, prompt)
     rag_chain = create_retrieval_chain(retriever, document_chain)
 
-    search_query = f"spreading fertiliser guidelines for SMD {smd_value} and rainfall {rain_forecast}mm"
+    # a targeted query for the vector database search
+    search_query = f"fertiliser spreading guidelines for SMD {smd_value} and forecast rain {forecast_rain_sum}mm in {soil_type} soil"
 
+    # execute the chain to get the final AI reasoning
     response = rag_chain.invoke({
         "input": search_query,
+        "final_score": final_risk,
         "target_date": target_date,
         "smd_value": smd_value,
-        "rain_forecast": rain_forecast,
-        "final_score": final_score
+        "forecast_rain_sum": forecast_rain_sum,
+        "past_rain_sum": past_rain_sum,
+        "soil_type": soil_type
     })
 
     return response["answer"]
 
 if __name__ == "__main__":
 
-    target_url = "https://teagasc.ie/environment/water-quality/water-quality-week/utilising-nitrogen-inputs-efficiently/#nleaching"
-    ingest_knowledge(target_url, is_url=True)
+    target_url = [
+        "https://teagasc.ie/environment/water-quality/water-quality-week/utilising-nitrogen-inputs-efficiently/#nleaching",
+        "https://www.gov.ie/en/department-of-agriculture-food-and-the-marine/press-releases/technical-note-amendment-to-the-good-agricultural-practices-for-the-protection-of-water-regulations/",
+        "https://teagasc.ie/news--events/daily/fertiliser-advice-under-prolonged-dry-soil-conditions/",
+        "https://teagasc.ie/environment/water-quality/farming-for-water-quality-assap/assap-factsheets/early-nitrogen-for-spring-grassland/",
+        "https://teagasc.ie/environment/water-quality/farming-for-water-quality-assap/improving-my-water-quality/nutrient-and-fertiliser-management/",
+        "https://teagasc.ie/news--events/daily/focus-on-ground-conditions-and-weather-before-spreading-slurry/",
+        "https://teagasc.ie/publications/how-to-reduce-nitrogen-losses-at-farm-level-php",
+        "https://farmingforwater.ie/top-tips-to-protect-water-quality-in-march-and-april/"
+    ]
 
-    test_date = "2026-04-15"
-    test_smd = 5.2
-    test_rain = 12.5
-    test_score = "High Risk"
-    
-    explanation = generate_nora_reasoning(test_date, test_smd, test_rain, test_score)
-    print(f"Recommendation: {test_score}\n Reason: {explanation}")
+    for url in target_url:
+        try:
+            ingest_knowledge(url, is_url=True)
+        except Exception as e:
+            print(f"Error {url}: {e}")
+
+print("All saved successfully.")
