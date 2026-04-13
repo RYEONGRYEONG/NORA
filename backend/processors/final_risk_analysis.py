@@ -12,12 +12,8 @@ def get_matrix_risk(smd_risk, rain_risk):
     return matrix[(smd_risk, rain_risk)]
 
 # STEP 1
-def final_analysis(db_conn, farm_id, target_date):
+def final_analysis(db_conn, farm_id, target_date, soil_type):
     with db_conn.connect() as conn:
-        query_soil = text("select soil_condition from farms where id = :farm_id")
-        result = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()
-        soil_type = result[0]
-
         max_allowed_date = date.today() + timedelta(days=7)
         if target_date > max_allowed_date:
             return {"error": f"Search available up to {max_allowed_date}"}
