@@ -209,3 +209,6 @@ __marimo__/
 
 node_modules/
 .next/
+
+# Vector Database
+backend/db/chroma_db/
