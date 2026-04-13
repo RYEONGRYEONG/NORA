@@ -18,6 +18,7 @@ from database import db_url, db_conn
 from services.smd_service import obs_analysis, save_results
 from services.forecast_service import update_farm_forecast
 from processors.final_risk_analysis import final_analysis
+from services.rag_service import generate_nora_reasoning
 
 app = FastAPI()
 
@@ -351,7 +352,26 @@ def risk_analysis(farm_id: int, target_date: str):
             update_farm_forecast(farm_id, farm[0], farm[1], conn)
             conn.commit()
 
-        result = final_analysis(db_conn, farm_id, parsed_date)
+        query_soil = text("select soil_condition from farms where id = :farm_id")
+        result = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()
+        soil_type = result[0]
+
+        full_report = final_analysis(db_conn, farm_id, parsed_date, soil_type)
+
+        target_data = next(item for item in full_report if item['date'] == target_date)
+
+        # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
+        ai_reasoning = generate_nora_reasoning(
+            target_date,
+            target_data['final_risk'],
+            target_data['smd_value'],
+            target_data['forecast_rain_sum'], 
+            target_data['past_rain_sum'],
+            target_data['soil_type']
+        )
+
+        result['ai_reasoning'] = ai_reasoning
+
         return result
 
     except Exception as e:
