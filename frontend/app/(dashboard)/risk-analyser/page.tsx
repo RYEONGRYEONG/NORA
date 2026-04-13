@@ -1,10 +1,15 @@
 'use client'
 import { useState } from 'react'
+import HourlyWeather from '@/components/hourlyWeather';
 
 export default function RiskAnalyserPage() {
   const [targetDate, setTargetDate] = useState('')
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+
+  const [aiReasoning, setAiReasoning] = useState<string | null>(null)
+  const [aiLoading, setAiLoading] = useState(false)
+
   const URL = process.env.NEXT_PUBLIC_API_URL;
   const today = new Date();
   const maxDate = new Date();
@@ -88,6 +93,31 @@ export default function RiskAnalyserPage() {
         </div>
       </div>
 
+      {/* RAG */}
+      <div className="mt-8 pt-6 border-t border-white/20 animate-in slide-in-from-bottom-4 duration-700">
+        <div className="flext items-center gap-2 mb-3">
+          <h3 className="text-lg font-black tracking-wide opacity-90">NORA's AI Reasoning</h3>
+        </div>
+
+        <div className="bg-black/10 rounded-2xl p-6 backdrop-blur-md border border-white/10 shadow-inner">
+          {aiLoading ? (
+            <div className="space-y-3 animate-pulse">
+              <div className="h-4 bg-white/30 rounded w-3/4"></div>
+              <div className="h-4 bg-white/30 rounded w-full"></div>
+              <div className="h-4 bg-white/30 rounded w-5/6"></div>
+            </div>
+          ) : aiReasoning ? (
+            <p className="text-sm md:text-base font-medium leading-relaxed opacity-95">
+              {aiReasoning}
+            </p>
+          ) : (
+            <p className="text-sm font-medium leading-relaxed opacity-70 italic">
+              Waiting for NORA's AI to analyse official guidelines...
+            </p>
+          )}
+        </div>
+      </div>
+      
       {/* alternative date recommendation */}
       {result && result.recommended_date && result.recommended_date !== targetDate && (
         <div className="bg-blue-50 border-2 border-blue-400 p-6 rounded-2xl flex justify-between items-center shadow-md animate-pulse">
