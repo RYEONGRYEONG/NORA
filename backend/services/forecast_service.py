@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import text
 from services.alert_service import alert_if_heavy_rain
 
-def update_farm_forecast(farm_id, lat, lon, conn):
+def update_farm_forecast(farm_id, lat, lon, conn, run_env='local'):
     # Met Éireann API
     endpoint = f"http://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast?lat={lat};long={lon}"
     r = requests.get(endpoint)
@@ -47,7 +47,7 @@ def update_farm_forecast(farm_id, lat, lon, conn):
             "farm_id": farm_id,
             "time": val['forecast_time'],
             "temp": val.get('temp'),
-            "precip": val.get('precip', 0.0),
+            "precip": val.get('precip'),
             "wind_speed": val.get('wind_speed'),
             "wind_gust": val.get('wind_gust'),
             "wind_dir": val.get('wind_dir'),
@@ -78,36 +78,37 @@ def update_farm_forecast(farm_id, lat, lon, conn):
         conn.execute(query, db_data)
         
         print(f"{farm_id} forecast updated successfully")
-    
-        user_query = text("select farm_name, user_email from farms where id = :farm_id")
-        farm_info = conn.execute(user_query, {"farm_id": farm_id}).fetchone()
 
-        if not farm_info or not farm_info[1]:
-            print(f"Skip Alert: No email found for {farm_id}")
-            return
-    
-        farm_name = farm_info[0]
-        user_email = farm_info[1]
+        if run_env == "github_actions":
+            user_query = text("select farm_name, user_email from farms where id = :farm_id")
+            farm_info = conn.execute(user_query, {"farm_id": farm_id}).fetchone()
+            
+            if not farm_info or not farm_info[1]:
+                print(f"Skip Alert: No email found for {farm_id}")
+                return
+            
+            farm_name = farm_info[0]
+            user_email = farm_info[1]
 
-        heavy_rain_threshold = 10.0
-        alert = False
+            heavy_rain_threshold = 10.0
+            alert = False
 
-        now = datetime.now()
-        time_limit = now + timedelta(hours=48)
+            now = datetime.now()
+            time_limit = now + timedelta(hours=48)
 
-        for val in db_data:
-            forecast_time = datetime.strptime(val['time'], '%Y-%m-%d %H:%M:%S')
+            for val in db_data:
+                forecast_time = datetime.strptime(val['time'], '%Y-%m-%d %H:%M:%S')
 
-            print(f"{farm_name} {val['time']} Precip: {val.get('precip')}") # Github action
+                print(f"{farm_name} {val['time']} Precip: {val.get('precip')}") # Github action
 
-            if now <= forecast_time <= time_limit:
-                if val.get('precip') and float(val['precip']) >= heavy_rain_threshold:
-                    alert_if_heavy_rain(user_email, farm_name, val['time'], val['precip'])
-                    alert = True
-                    break
+                if now <= forecast_time <= time_limit:
+                    if val.get('precip') and float(val['precip']) >= heavy_rain_threshold:
+                        alert_if_heavy_rain(user_email, farm_name, val['time'], val['precip'])
+                        alert = True
+                        break
 
-        if not alert:
-            print(f"No Alert Sent: No Heavy rain detected for {farm_name} within 48h")
+            if not alert:
+                print(f"No Alert Sent: No Heavy rain detected for {farm_name} within 48h")
 
     except Exception as e:
         conn.rollback()
