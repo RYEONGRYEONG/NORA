@@ -46,6 +46,7 @@ jobs:
     if: ${{ github.event_name == 'schedule' || github.event.inputs.run_target == 'both' || github.event.inputs.run_target == 'forecast_only'}}
     env:
       DATABASE_URL: ${{secrets.DATABASE_URL}}
+      RUN_ENV: github_actions
       EMAIL: ${{secrets.EMAIL}}
       EMAIL_PW: ${{secrets.EMAIL_PW}}
     run: python backend/main.py forecast
