@@ -19,7 +19,6 @@ from database import db_url, db_conn
 from services.smd_service import obs_analysis, save_results
 from services.forecast_service import update_farm_forecast
 from processors.final_risk_analysis import final_analysis
-from services.rag_service import generate_nora_reasoning
 
 app = FastAPI()
 
@@ -339,6 +338,7 @@ def get_my_farms(email: str):
 
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
+    from services.rag_service import generate_nora_reasoning
     
     try: 
         try: # e.g, "2026-03-20"
