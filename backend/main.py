@@ -369,7 +369,7 @@ def risk_analysis(farm_id: int, target_date: str):
             target_data['smd_value'],
             target_data['forecast_rain_sum'], 
             target_data['past_rain_sum'],
-            target_data['soil_type']
+            'soil_type'
         )
 
         full_report['ai_reasoning'] = ai_reasoning
