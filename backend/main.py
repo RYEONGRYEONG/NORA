@@ -363,16 +363,16 @@ def risk_analysis(farm_id: int, target_date: str):
         target_data = next(item for item in full_report if item['date'] == target_date)
 
         # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
-        ai_reasoning = generate_nora_reasoning(
-            target_date,
-            target_data['final_risk'],
-            target_data['smd_value'],
-            target_data['forecast_rain_sum'], 
-            target_data['past_rain_sum'],
-            target_data['soil_type']
-        )
+        # ai_reasoning = generate_nora_reasoning(
+        #     target_date,
+        #     target_data['final_risk'],
+        #     target_data['smd_value'],
+        #     target_data['forecast_rain_sum'], 
+        #     target_data['past_rain_sum'],
+        #     target_data['soil_type']
+        # )
 
-        result['ai_reasoning'] = ai_reasoning
+        # result['ai_reasoning'] = ai_reasoning
 
         return result
 
