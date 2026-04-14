@@ -29,6 +29,8 @@ export default function RiskAnalyserPage() {
     const farmId = JSON.parse(savedFarm).id;
 
     setLoading(true)
+    setAiLoading(true)
+
     try {
         const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${checkDate}`, {
             method: 'GET',
@@ -40,6 +42,10 @@ export default function RiskAnalyserPage() {
         if (response.ok) {
         setResult(data);
         setTargetDate(checkDate); 
+
+        if (data.ai_reasoning){
+          setAiReasoning(data.ai_reasoning);
+        }
       } else {
         alert(data.detail || data.message || "Failed to analyse risk.");
       }
@@ -48,6 +54,7 @@ export default function RiskAnalyserPage() {
       alert("Failed to reach the backend server.");
     } finally {
       setLoading(false);
+      setAiLoading(false);
     }
   };
 
