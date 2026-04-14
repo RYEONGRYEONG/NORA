@@ -338,7 +338,7 @@ def get_my_farms(email: str):
 
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
-    #from services.rag_service import generate_nora_reasoning
+    from services.rag_service import generate_nora_reasoning
     
     try: 
         try: # e.g, "2026-03-20"
@@ -360,21 +360,21 @@ def risk_analysis(farm_id: int, target_date: str):
 
         full_report = final_analysis(db_conn, farm_id, parsed_date, soil_type)
 
-        # target_data = next(item for item in full_report if item['date'] == target_date)
+        target_data = next(item for item in full_report if item['date'] == target_date)
 
         # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
-        # ai_reasoning = generate_nora_reasoning(
-        #     target_date,
-        #     target_data['final_risk'],
-        #     target_data['smd_value'],
-        #     target_data['forecast_rain_sum'], 
-        #     target_data['past_rain_sum'],
-        #     target_data['soil_type']
-        # )
+        ai_reasoning = generate_nora_reasoning(
+            target_date,
+            target_data['final_risk'],
+            target_data['smd_value'],
+            target_data['forecast_rain_sum'], 
+            target_data['past_rain_sum'],
+            target_data['soil_type']
+        )
 
-        # result['ai_reasoning'] = ai_reasoning
+        result['ai_reasoning'] = ai_reasoning
 
-        return full_report
+        return result
 
     except Exception as e:
         print(f"Analysis Error: {e}")
