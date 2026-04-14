@@ -30,6 +30,7 @@ export default function RiskAnalyserPage() {
 
     setLoading(true)
     setAiLoading(true)
+    setAiReasoning(null)
 
     try {
         const response = await fetch(`${URL}/api/analysis?farm_id=${farmId}&target_date=${checkDate}`, {
@@ -40,23 +41,37 @@ export default function RiskAnalyserPage() {
         const data = await response.json();
 
         if (response.ok) {
-        setResult(data);
-        setTargetDate(checkDate); 
+          setResult(data);
+          setTargetDate(checkDate); 
+          setLoading(false);
 
-        if (data.ai_reasoning){
-          setAiReasoning(data.ai_reasoning);
+          try {
+            const aiResponse = await fetch(`${URL}/api/reasoning?farm_id=${farmId}&target_date=${checkDate}`);
+            const aiData = await aiResponse.json()
+
+            if (aiResponse.ok && aiData.ai_reasoning){
+              setAiReasoning(aiData.ai_reasoning);
+            } else{
+              setAiReasoning("failed to retreival ")
+            }  
+          } catch (aiError){
+            console.error("AI reasoning error:", aiError);
+            setAiReasoning("AI service is temporarily unavailable.")
+        } finally{
+          setAiLoading(false)
         }
       } else {
         alert(data.detail || data.message || "Failed to analyse risk.");
+        setLoading(false);
+        setAiLoading(false);
       }
     } catch (error) {
       console.error("Connection error:", error);
       alert("Failed to reach the backend server.");
-    } finally {
       setLoading(false);
       setAiLoading(false);
     }
-  };
+  }
 
   const riskColour = (risk: string) => {
     if (risk === 'High') return 'bg-red-500 text-white shadow-red-500/30'
