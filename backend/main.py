@@ -360,7 +360,7 @@ def risk_analysis(farm_id: int, target_date: str):
 
         full_report = final_analysis(db_conn, farm_id, parsed_date, soil_type)
 
-        target_data = next(item for item in full_report if item['date'] == target_date)
+        # target_data = next(item for item in full_report if item['date'] == target_date)
 
         # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
         # ai_reasoning = generate_nora_reasoning(
@@ -374,7 +374,7 @@ def risk_analysis(farm_id: int, target_date: str):
 
         # result['ai_reasoning'] = ai_reasoning
 
-        return result
+        return full_report
 
     except Exception as e:
         print(f"Analysis Error: {e}")
