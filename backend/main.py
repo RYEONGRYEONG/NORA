@@ -306,7 +306,7 @@ def delete_farm(farm_id: int):
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error during deletion")
-
+    
 @app.get("/api/farms")
 def get_my_farms(email: str):
     try:
@@ -336,17 +336,16 @@ def get_my_farms(email: str):
         print(f"Fetch Farms Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch farms")
 
+def parse_date(date_str: str):
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return datetime.strptime(date_str, '%m/%d/%Y').date()
+
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
-    from services.rag_service import generate_nora_reasoning
-    
     try: 
-        try: # e.g, "2026-03-20"
-            parsed_date = datetime.strptime(target_date, '%Y-%m-%d').date()
-        
-        except ValueError: # e.g, "03/20/2026"
-            parsed_date = datetime.strptime(target_date, '%m/%d/%Y').date()
-
+        parsed_date = parse_date(target_date)
         print(f"DEBUG: farm id: {farm_id}, target date: {parsed_date}", flush=True)    
 
         with db_conn.connect() as conn:
@@ -355,11 +354,28 @@ def risk_analysis(farm_id: int, target_date: str):
             conn.commit()
 
             query_soil = text("select soil_condition from farms where id = :farm_id")
-            result = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()
-            soil_type = result[0]
+            soil_type = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()[0]
 
         full_report = final_analysis(db_conn, farm_id, parsed_date, soil_type)
 
+        return full_report
+    
+    except Exception as e:
+        print(f"Analysis Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/reasoning")
+def get_ai_reasoning(farm_id: int, target_date: str):
+    from services.rag_service import generate_nora_reasoning
+
+    try:
+        parsed_date = parse_date(target_date)
+
+        with db_conn.connect() as conn:
+            query_soil = text("select soil_condition from farms where id = :farm_id")
+            soil_type = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()[0]
+
+        full_report = final_analysis(db_conn, farm_id, target_data, soil_type)
         target_data = next(item for item in full_report['full_demo_report'] if item['date'] == target_date)
 
         # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
@@ -372,12 +388,10 @@ def risk_analysis(farm_id: int, target_date: str):
             soil_type
         )
 
-        full_report['ai_reasoning'] = ai_reasoning
-
-        return full_report
+        return {"ai_reasoning": ai_reasoning}
 
     except Exception as e:
-        print(f"Analysis Error: {e}")
+        print(f"AI Reasoning Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/save-farm")
