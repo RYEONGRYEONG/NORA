@@ -6,9 +6,9 @@ os.environ["USER_AGENT"] = "NORA_Agent"
 
 #sys.modules['pwd'] = types.ModuleType('pwd')
 
-from langchain_community.document_loaders.pdf import PyPDFLoader
-from langchain_community.document_loaders.web_base import WebBaseLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+#from langchain_community.document_loaders.pdf import PyPDFLoader
+#from langchain_community.document_loaders.web_base import WebBaseLoader
+#from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 # RetrievalQA -> deprecated
 # create_retrieval_chain recommended
@@ -21,11 +21,6 @@ from langchain_qdrant import QdrantVectorStore
 
 load_dotenv()
 
-qdrant_client = QdrantClient(
-    url=os.getenv("QDRANT_URL"),
-    api_key=os.getenv("QDRANT_API_KEY"),
-)
-
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 OPENAI_API_KEY = os.getenv("NORA_RAG")
@@ -33,34 +28,38 @@ COLLECTION_NAME = "nora-vector-db"
 
 EMBEDDING = OpenAIEmbeddings(model="text-embedding-3-small", openai_api_key=OPENAI_API_KEY)
 
-def ingest_knowledge(source_path):
-    print(f"Fetching data from {source_path}")
-    loader = WebBaseLoader(source_path)
-    docs = loader.load()
+qdrant_client = QdrantClient(
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY,
+)
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=100, separators=["\n\n", "\n", ".", ","])
-    chunks = text_splitter.split_documents(docs)
+db = QdrantVectorStore(
+    client=qdrant_client,
+    collection_name=COLLECTION_NAME,
+    embedding=EMBEDDING
+)
 
-    QdrantVectorStore.from_documents(
-        chunks,
-        EMBEDDING,
-        url=QDRANT_URL,
-        api_key=QDRANT_API_KEY,
-        collection_name=COLLECTION_NAME,
-        force_recreate=True
-    )
+# def ingest_knowledge(source_path):
+#     print(f"Fetching data from {source_path}")
+#     loader = WebBaseLoader(source_path)
+#     docs = loader.load()
 
-    print(f"Cloud Ingestion completed. ({len(chunks)} chunks saved to Qdrant)")
+#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=100, separators=["\n\n", "\n", ".", ","])
+#     chunks = text_splitter.split_documents(docs)
+
+#     QdrantVectorStore.from_documents(
+#         chunks,
+#         EMBEDDING,
+#         url=QDRANT_URL,
+#         api_key=QDRANT_API_KEY,
+#         collection_name=COLLECTION_NAME,
+#         force_recreate=True
+#     )
+
+#     print(f"Cloud Ingestion completed. ({len(chunks)} chunks saved to Qdrant)")
 
 # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
 def generate_nora_reasoning(target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type):
-   
-    db = QdrantVectorStore.from_existing_collection(
-        embedding=EMBEDDING,
-        url=QDRANT_URL,
-        api_key=QDRANT_API_KEY,
-        collection_name=COLLECTION_NAME,
-    )
 
     retriever = db.as_retriever(search_kwargs={"k": 3})
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, openai_api_key=OPENAI_API_KEY)
@@ -96,8 +95,7 @@ def generate_nora_reasoning(target_date, final_risk, smd_value, forecast_rain_su
 
     return response["answer"]
 
-if __name__ == "__main__":
-    print(qdrant_client.get_collections())
+# if __name__ == "__main__":
 
 #     target_url = [
 #         "https://teagasc.ie/environment/water-quality/water-quality-week/utilising-nitrogen-inputs-efficiently/#nleaching",
