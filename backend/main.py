@@ -354,9 +354,9 @@ def risk_analysis(farm_id: int, target_date: str):
             update_farm_forecast(farm_id, farm[0], farm[1], conn)
             conn.commit()
 
-        query_soil = text("select soil_condition from farms where id = :farm_id")
-        result = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()
-        soil_type = result[0]
+            query_soil = text("select soil_condition from farms where id = :farm_id")
+            result = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()
+            soil_type = result[0]
 
         full_report = final_analysis(db_conn, farm_id, parsed_date, soil_type)
 
