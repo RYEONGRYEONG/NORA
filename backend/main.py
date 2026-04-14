@@ -338,7 +338,7 @@ def get_my_farms(email: str):
 
 @app.get("/api/analysis")
 def risk_analysis(farm_id: int, target_date: str):
-    from services.rag_service import generate_nora_reasoning
+    #from services.rag_service import generate_nora_reasoning
     
     try: 
         try: # e.g, "2026-03-20"
