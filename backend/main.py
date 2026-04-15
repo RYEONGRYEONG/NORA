@@ -375,12 +375,12 @@ def get_ai_reasoning(farm_id: int, target_date: str):
             query_soil = text("select soil_condition from farms where id = :farm_id")
             soil_type = conn.execute(query_soil, {"farm_id": farm_id}).fetchone()[0]
 
-        full_report = final_analysis(db_conn, farm_id, target_data, soil_type)
+        full_report = final_analysis(db_conn, farm_id, parsed_date, soil_type)
         target_data = next(item for item in full_report['full_demo_report'] if item['date'] == target_date)
 
         # target_date, final_risk, smd_value, forecast_rain_sum, past_rain_sum, soil_type
         ai_reasoning = generate_nora_reasoning(
-            target_date,
+            parsed_date,
             target_data['final_risk'],
             target_data['smd_value'],
             target_data['forecast_rain_sum'], 
