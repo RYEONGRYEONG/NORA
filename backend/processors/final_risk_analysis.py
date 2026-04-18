@@ -21,6 +21,7 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
         today = date.today()
         start = today - timedelta(days=2)
 
+
         query_weather = text("""
             select date, rain, maxtp, mintp, wdsp, cbl, humidity, glorad, smd_wd, smd_md, smd_pd from v_unified_weather
             where (farm_id = :farm_id or farm_id is null) and date >= :start
@@ -65,10 +66,11 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
 
     target_date_str = target_date.strftime("%Y-%m-%d")
     first_check = next((item for item in full_demo_report if item['date'] == target_date_str), None)
+    display_date = target_date.strftime("%d-%m-%Y")
 
     if first_check['final_risk'] == 'Low':
         result = dict(first_check)
-        result['message'] = f"{target_date_str} is a safe day for fertiliser application."
+        result['message'] = f"{display_date} is a safe day for fertiliser application."
         result['recommended_date'] = target_date_str
         result['full_demo_report'] = full_demo_report
         return result
@@ -78,13 +80,13 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
 
         if alt_low:
             result = dict(alt_low)
-            result['message'] = f"{target_date_str} is Medium. It is acceptable, but {alt_low['date']} (Low) is a safer alternative."
+            result['message'] = f"{display_date} is Medium. It is acceptable, but {alt_low['date']} (Low) is a safer alternative."
             result['recommended_date'] = alt_low['date']
             result['full_demo_report'] = full_demo_report
             return result
         else:
             result = dict(first_check)
-            result['message'] = f"{target_date_str} is Medium. No safer days (Low) found in the forecast, so proceed with caution."
+            result['message'] = f"{display_date} is Medium. No safer days (Low) found in the forecast, so proceed with caution."
             result['recommended_date'] = target_date_str 
             result['full_demo_report'] = full_demo_report
             return result
@@ -94,7 +96,7 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
         alt_low = next((item for item in full_demo_report if item['final_risk'] == 'Low' and item['date'] != target_date_str), None)
         if alt_low:
             result = dict(alt_low)
-            result['message'] = f"{target_date_str} is High-risk! We strongly recommend waiting until {alt_low['date']} (Low)."
+            result['message'] = f"{display_date} is High-risk! We strongly recommend waiting until {alt_low['date']} (Low)."
             result['recommended_date'] = alt_low['date']
             result['full_demo_report'] = full_demo_report
             return result
@@ -102,14 +104,14 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
         alt_medium = next((item for item in full_demo_report if item['final_risk'] == 'Medium' and item['date'] != target_date_str), None)
         if alt_medium:
             result = dict(alt_medium)
-            result['message'] = f"{target_date_str} is High-risk! No optimal days found, but {alt_medium['date']} (Medium) is a better option."
+            result['message'] = f"{display_date} is High-risk! No optimal days found, but {alt_medium['date']} (Medium) is a better option."
             result['recommended_date'] = alt_medium['date']
             result['full_demo_report'] = full_demo_report
             return result
         
         # all High
         result = dict(first_check)
-        result['message'] = f"{target_date_str} is High-risk, and there are NO suitable alternative dates within the forecast. DO NOT SPREAD."
+        result['message'] = f"{display_date} is High-risk, and there are NO suitable alternative dates within the forecast. DO NOT SPREAD."
         result['recommended_date'] = None
         result['full_demo_report'] = full_demo_report
         return result
