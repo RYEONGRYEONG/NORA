@@ -33,8 +33,7 @@ def get_smd_status(weather_list, soil_type, target_date):
             total_rad = day_data['glorad']
         )
 
-        _, next_smd, _ = calculated_smd(final_smd, pe, day_data['rain'], soil_type)
-        final_smd = next_smd
+        _, final_smd, _ = calculated_smd(final_smd, pe, day_data['rain'], soil_type)
 
         if day_data['date'] == target_date:
             break
