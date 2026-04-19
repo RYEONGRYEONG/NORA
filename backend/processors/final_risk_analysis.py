@@ -79,8 +79,9 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
         alt_low = next((item for item in full_demo_report if item['final_risk'] == 'Low' and item['date'] != target_date_str), None)
 
         if alt_low:
+            alt_low_display = date.fromisoformat(alt_low['date']).strftime("%d-%m-%Y")
             result = dict(alt_low)
-            result['message'] = f"{display_date} is Medium. It is acceptable, but {alt_low['date']} (Low) is a safer alternative."
+            result['message'] = f"{display_date} is Medium. It is acceptable, but {alt_low_display} (Low) is a safer alternative."
             result['recommended_date'] = alt_low['date']
             result['full_demo_report'] = full_demo_report
             return result
@@ -94,17 +95,21 @@ def final_analysis(db_conn, farm_id, target_date, soil_type):
     # first_check['final_risk'] == 'High'
     else:
         alt_low = next((item for item in full_demo_report if item['final_risk'] == 'Low' and item['date'] != target_date_str), None)
+        
         if alt_low:
+            alt_low_display = date.fromisoformat(alt_low['date']).strftime("%d-%m-%Y")
             result = dict(alt_low)
-            result['message'] = f"{display_date} is High-risk! We strongly recommend waiting until {alt_low['date']} (Low)."
+            result['message'] = f"{display_date} is High-risk! We strongly recommend waiting until {alt_low_display} (Low)."
             result['recommended_date'] = alt_low['date']
             result['full_demo_report'] = full_demo_report
             return result
             
         alt_medium = next((item for item in full_demo_report if item['final_risk'] == 'Medium' and item['date'] != target_date_str), None)
+        
         if alt_medium:
+            alt_medium_display = date.fromisoformat(alt_medium['date']).strftime("%d-%m-%Y")
             result = dict(alt_medium)
-            result['message'] = f"{display_date} is High-risk! No optimal days found, but {alt_medium['date']} (Medium) is a better option."
+            result['message'] = f"{display_date} is High-risk! No optimal days found, but {alt_medium_display} (Medium) is a better option."
             result['recommended_date'] = alt_medium['date']
             result['full_demo_report'] = full_demo_report
             return result
