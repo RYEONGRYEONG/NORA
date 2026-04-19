@@ -14,7 +14,12 @@ export default function RiskAnalyserPage() {
   const today = new Date();
   const maxDate = new Date();
   maxDate.setDate(today.getDate() + 7);
-  const maxDateString = maxDate.toISOString().split('T')[0]; // for JSON
+  const maxDateString = maxDate.toISOString().split('T')[0]; // for JSON, ISO Date Format: YYYY-MM-DD
+
+  const formatToIrish = (dateStr: string) => {
+    if (!dateStr) return '';
+    return dateStr.split('-').reverse().join('-');
+  }
 
   const currentData = result?.full_demo_report?.find((day: any) => day.date === targetDate); 
   const handleAnalyse = async (dateToUse?: string) => {
@@ -221,7 +226,7 @@ export default function RiskAnalyserPage() {
                   return (
                     <tr key={day.date} className={`${isTarget ? "bg-slate-50" : "hover:bg-slate-50/50"} transition-colors`}>
                       <td className="px-5 py-4">
-                        <span className={`font-mono ${isTarget ? "font-black text-slate-900" : "text-slate-600"}`}>{day.date}</span>
+                        <span className={`font-mono ${isTarget ? "font-black text-slate-900" : "text-slate-600"}`}>{formatToIrish(day.date)}</span>
                         {isTarget && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-600">TARGET</span>}
                         {isRecommended && <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600">RECOMMENDED</span>}
                       </td>
