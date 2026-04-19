@@ -4,6 +4,7 @@ import HourlyWeather from '@/components/hourlyWeather';
 
 export default function RiskAnalyserPage() {
   const [targetDate, setTargetDate] = useState('')
+  const [changeDate, setChangeDate] = useState('')
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
@@ -21,7 +22,7 @@ export default function RiskAnalyserPage() {
     return dateStr.split('-').reverse().join('-');
   }
 
-  const currentData = result?.full_demo_report?.find((day: any) => day.date === targetDate); 
+  const currentData = result?.full_demo_report?.find((day: any) => day.date === changeDate); 
   const handleAnalyse = async (dateToUse?: string) => {
     const checkDate = dateToUse || targetDate
     if (!checkDate) return alert("Please select a target date.")
@@ -48,6 +49,7 @@ export default function RiskAnalyserPage() {
         if (response.ok) {
           setResult(data);
           setTargetDate(checkDate); 
+          setChangeDate(checkDate);
           setLoading(false);
 
           try {
@@ -167,10 +169,10 @@ export default function RiskAnalyserPage() {
           <p className="text-sm font-bold uppercase tracking-widest opacity-80 mb-2">Final Assessment</p>
           <h2 className="text-6xl font-black mb-4">{currentData.final_risk}</h2>
           
-          {result.recommended_date === targetDate && (
+          {result.recommended_date === changeDate && (
             <p className="text-xl font-medium mb-8 opacity-90">{result.message}</p>
           )}
-          {result.recommended_date !== targetDate && (
+          {result.recommended_date !== changeDate && (
             <p className="text-xl font-medium mb-8 opacity-90">Please see the alternative suggestion above.</p>
           )}
           
@@ -220,7 +222,7 @@ export default function RiskAnalyserPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {result.full_demo_report.map((day: any) => {
-                  const isTarget = day.date === targetDate;
+                  const isTarget = day.date === changeDate;
                   const isRecommended = day.date === result.recommended_date && result.recommended_date !== targetDate;
                   
                   return (
