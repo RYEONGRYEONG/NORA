@@ -33,7 +33,7 @@ export default function DailyWeather({ data }: { data: any[] }) {
           return (
             <div key={index} className="flex-none w-36 bg-slate-50 p-5 rounded-2xl border border-slate-100 text-center">
               <p className="text-xs font-bold text-[#0782c5] uppercase">{format(dateObj, 'EEE')}</p>
-              <p className="text-xl font-black text-slate-900 mt-1">{format(dateObj, 'MMM dd')}</p>
+              <p className="text-xl font-black text-slate-900 mt-1">{format(dateObj, 'dd MMM')}</p>
               
               <div className="text-4xl my-4">{icon}</div>
               
