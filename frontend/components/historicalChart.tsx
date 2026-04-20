@@ -7,7 +7,7 @@ import { format, parseISO } from 'date-fns';
 export default function HistoricalChart({ trend, average }: { trend: any[], average: any }) {
   const formattedData = (trend || []).map(item => ({
     ...item,
-    displayDate: format(parseISO(item.date), 'dd/mm'),
+    displayDate: format(parseISO(item.date), 'dd/MM'),
     avgSmd: average?.smd || 0
   }));
 
