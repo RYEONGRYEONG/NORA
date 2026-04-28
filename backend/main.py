@@ -208,8 +208,10 @@ def get_historical_data(farm_id: int):
             avg_query = text(f"""
                 select avg({smd_col}) as avg_smd, avg(rain) as avg_rain
                 from obs_hist
-                where month(date) = month(date_sub(curdate(), interval 1 day))
-                and date < date_sub(curdate(), interval 1 year) 
+                where year(date) between 2021 and 2025 and
+                ( dayofyear(date) between dayofyear(date_sub(curdate(), interval 7 day)) 
+                and dayofyear(date_add(curdate(), interval 7 day))
+                )
             """)
             avg_row = conn.execute(avg_query).fetchone()
 
