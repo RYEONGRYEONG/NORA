@@ -65,6 +65,13 @@ export default function Navbar() {
           >
             My Farms
           </Link>
+
+          <Link
+            href="/resources"
+            className="hover:text-[#0782c5] transition-colors flex items-center gap-1"
+          >
+            User Resources
+          </Link>
         </nav>
       </div>
       
