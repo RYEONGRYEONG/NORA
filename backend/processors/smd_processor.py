@@ -8,7 +8,7 @@ def calculate_pe_from_obs(row): # pressure, humidity, dew_point Data X
     t_min = row['min_temp']
     t_mean = (t_max + t_min) / 2
     rad_mj = row['glorad'] / 100.0  # J/cm2 -> MJ/m2
-    wind_ms = max(0, row['wdsp'] * 0.5144)   # Knot -> m/s
+    wind_ms = max(0, row['wdsp'] * 0.5144) * 0.75  # Knot -> m/s
     
     es_tmax = 0.6108 * math.exp((17.27 * t_max) / (t_max + 237.3))
     es_tmin = 0.6108 * math.exp((17.27 * t_min) / (t_min + 237.3))
@@ -24,7 +24,7 @@ def calculate_pe_from_obs(row): # pressure, humidity, dew_point Data X
     delta = (4098 * es_mean) / ((t_mean + 237.3) ** 2)
     gamma = 0.000665 * pressure_kpa
     
-    rn = 0.77 * rad_mj
+    rn = 0.55 * rad_mj
     wind_factor = 1 + 0.34 * wind_ms
     num = (0.408 * delta * rn) + (gamma * (900 / (t_mean + 273)) * wind_ms * vpd)
     den = delta + (gamma * wind_factor)
@@ -41,7 +41,7 @@ def calculate_pe_forecast(max_temp, min_temp, wind_speed, pressure, humidity, to
     humidity = float(humidity)
     total_rad = float(total_rad)
 
-    wind_speed_ms = max(0, wind_speed * 0.5144) # Knot -> m/s
+    wind_speed_ms = max(0, wind_speed * 0.5144) * 0.75 # Knot -> m/s
     total_rad_mj = total_rad / 100.0  # J/cm2 -> MJ/m2
     mean_temp = (max_temp + min_temp) / 2
 
@@ -59,7 +59,7 @@ def calculate_pe_forecast(max_temp, min_temp, wind_speed, pressure, humidity, to
     pressure_kpa = pressure / 10
     gamma = 0.000665 * pressure_kpa
     
-    rn = 0.77 * total_rad_mj
+    rn = 0.55 * total_rad_mj
     wind_factor = 1 + 0.34 * wind_speed_ms
 
     num = (0.408 * delta * rn) + (gamma * (900 / (mean_temp + 273)) * wind_speed_ms * vpd)
